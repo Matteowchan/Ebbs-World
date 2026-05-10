@@ -1,0 +1,2821 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+<title>Ebb's World</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ebb's World">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#6B8A4F">
+<meta name="description" content="creating moments of joy, a personal tracker">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%236B8A4F'/%3E%3Ctext x='96' y='132' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='120' fill='%23F0E5CD'%3EE%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%236B8A4F'/%3E%3Ctext x='96' y='132' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='120' fill='%23F0E5CD'%3EE%3C/text%3E%3C/svg%3E">
+
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Ebb%27s%20World%22%2C%22short_name%22%3A%22Ebb%27s%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23F0E5CD%22%2C%22theme_color%22%3A%22%236B8A4F%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D%2527http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2527%2520viewBox%253D%25270%25200%2520192%2520192%2527%253E%253Crect%2520width%253D%2527192%2527%2520height%253D%2527192%2527%2520fill%253D%2527%25236B8A4F%2527%252F%253E%253Ctext%2520x%253D%252796%2527%2520y%253D%2527132%2527%2520text-anchor%253D%2527middle%2527%2520font-family%253D%2527Georgia%252Cserif%2527%2520font-style%253D%2527italic%2527%2520font-size%253D%2527120%2527%2520fill%253D%2527%2523F0E5CD%2527%253EE%253C%252Ftext%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%22%7D%5D%7D">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+button { background: none; border: none; padding: 0; cursor: pointer; font: inherit; color: inherit; }
+input, textarea, select { font: inherit; color: inherit; }
+
+:root {
+  --paper: #F0E5CD;
+  --accent-1: #6B8A4F;
+  --accent-2: #B07570;
+  --ink-primary: #2E251C;
+  --ink-secondary: #5A4A3A;
+  --ink-faint: #8B7A65;
+  --ink-very-faint: #B0A085;
+  --line-color: rgba(139, 122, 101, 0.16);
+  --card-border: rgba(46, 37, 28, 0.12);
+  --card-border-strong: rgba(46, 37, 28, 0.25);
+  --card-bg: rgba(46, 37, 28, 0.05);
+  --card-active-bg: rgba(107, 138, 79, 0.18);
+  --hover-bg: rgba(46, 37, 28, 0.04);
+  --focus-bg: rgba(46, 37, 28, 0.07);
+}
+
+body {
+  font-family: 'Lora', Georgia, serif;
+  color: var(--ink-primary);
+  background-color: rgba(46, 37, 28, 0.06);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.si { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 400; }
+.s  { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 400; }
+
+.page-bg {
+  min-height: 100vh;
+  padding: 32px 24px 60px;
+  display: flex;
+  justify-content: center;
+}
+
+.paper {
+  width: 100%;
+  max-width: 1100px;
+  background-color: var(--paper);
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, var(--line-color) 31px, var(--line-color) 32px);
+  border: 0.5px solid rgba(46, 37, 28, 0.18);
+  border-radius: 6px;
+  padding: 32px 32px 36px 64px;
+  position: relative;
+}
+
+.margin-line {
+  position: absolute;
+  left: 46px;
+  top: 22px;
+  bottom: 22px;
+  width: 1.5px;
+  background: var(--accent-2);
+  opacity: 0.55;
+}
+
+.header-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand { display: flex; align-items: center; gap: 11px; }
+
+.avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--accent-1);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--paper);
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.brand-name { font-size: 14px; font-weight: 500; }
+.brand-tagline { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 14px; color: var(--accent-2); }
+
+.theme-picker { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.theme-picker-label { font-size: 11px; color: var(--ink-faint); margin-right: 2px; }
+
+.theme-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 11px;
+  font-size: 12px;
+  border: 0.5px solid var(--card-border);
+  border-radius: 5px;
+  background: rgba(46, 37, 28, 0.04);
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s, border-color .15s;
+  font-family: inherit;
+  color: var(--ink-primary);
+}
+.theme-button:hover { background: var(--hover-bg); border-color: var(--card-border-strong); }
+.theme-button-dots { display: flex; gap: 2px; }
+.theme-button-dots .theme-dot { width: 8px; height: 8px; }
+.theme-dot { border-radius: 50%; }
+.theme-dot.bordered { border: 0.5px solid rgba(46, 37, 28, 0.3); }
+
+.theme-dropdown-wrap { position: relative; }
+
+.theme-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--paper);
+  border: 0.5px solid var(--card-border-strong);
+  border-radius: 6px;
+  box-shadow: 0 4px 18px rgba(46, 37, 28, 0.18);
+  padding: 6px;
+  min-width: 240px;
+  z-index: 100;
+}
+
+.theme-dropdown-section {
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  padding: 5px 9px;
+  margin-top: 2px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+.theme-dropdown-section:first-child { margin-top: 0; }
+
+.theme-dropdown-divider {
+  border-top: 0.5px solid rgba(46, 37, 28, 0.12);
+  margin: 6px 0;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background .15s;
+  user-select: none;
+}
+.theme-option:hover { background: var(--hover-bg); }
+.theme-option.active { background: var(--card-active-bg); font-weight: 500; }
+.theme-option-name { flex: 1; color: var(--ink-primary); }
+.theme-option .theme-dot { width: 10px; height: 10px; }
+.theme-option-edit {
+  font-size: 11px;
+  color: var(--ink-faint);
+  padding: 4px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.theme-option-edit:hover { color: var(--accent-2); background: rgba(176, 117, 112, 0.1); }
+
+.theme-add-new {
+  padding: 9px 9px;
+  font-size: 13px;
+  color: var(--accent-2);
+  cursor: pointer;
+  border-radius: 4px;
+  user-select: none;
+}
+.theme-add-new:hover { background: rgba(176, 117, 112, 0.1); }
+
+.font-size-pill {
+  display: inline-flex;
+  border: 0.5px solid var(--card-border);
+  border-radius: 5px;
+  overflow: hidden;
+  background: rgba(46, 37, 28, 0.04);
+}
+.font-size-button {
+  padding: 6px 11px;
+  font-size: 12px;
+  cursor: pointer;
+  border-right: 0.5px solid var(--card-border);
+  transition: background .15s, color .15s;
+  user-select: none;
+  color: var(--ink-secondary);
+  font-family: inherit;
+}
+.font-size-button:last-child { border-right: none; }
+.font-size-button:hover { background: var(--hover-bg); color: var(--ink-primary); }
+.font-size-button.active { background: var(--accent-1); color: var(--paper); }
+
+/* Çizgi üstü yazı sorunu için zemin rengi maskelemesi */
+.title-row,
+.title-display,
+.subtitle,
+.section-label,
+.verse-row,
+.breadcrumb,
+.year-section,
+.verse,
+.footer-actions {
+  background-color: var(--paper);
+}
+
+/* Yazı boyutu ölçeklendirme */
+body.font-small { font-size: 13px; }
+body.font-medium { font-size: 14px; }
+body.font-large { font-size: 16px; }
+
+body.font-small .title-display { font-size: 38px; }
+body.font-small .title-display.smaller { font-size: 32px; }
+body.font-small .month-name { font-size: 19px; }
+body.font-small .modal-title { font-size: 24px; }
+body.font-small .verse { font-size: 13px; }
+
+body.font-large .title-display { font-size: 52px; }
+body.font-large .title-display.smaller { font-size: 44px; }
+body.font-large .month-name { font-size: 24px; }
+body.font-large .modal-title { font-size: 32px; }
+body.font-large .verse { font-size: 16px; }
+body.font-large .row-item, body.font-large .row-text { font-size: 15px; }
+body.font-large .idea-title { font-size: 14px; }
+body.font-large .meal-cell { font-size: 13px; }
+body.font-large .day-num { font-size: 20px; }
+body.font-large .book-title { font-size: 19px; }
+body.font-large .intent-text { font-size: 16px; }
+body.font-large .workout-text { font-size: 16px; }
+body.font-large .breadcrumb { font-size: 13px; }
+body.font-large .subtitle { font-size: 14px; }
+body.font-large .section-label { font-size: 12px; }
+body.font-large .month-stats { font-size: 12px; }
+body.font-large .brand-tagline, body.font-large .brand-name { font-size: 16px; }
+body.font-large .week-range { font-size: 16px; }
+body.font-large .book-today-note { font-size: 14px; }
+body.font-large .day-name { font-size: 12px; }
+
+/* Toast bildirimi */
+.app-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink-primary);
+  color: var(--paper);
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity .25s, transform .25s;
+  pointer-events: none;
+  box-shadow: 0 4px 18px rgba(46, 37, 28, 0.25);
+}
+.app-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.app-toast.error {
+  background: #8B3A2A;
+}
+
+.gratitude-section {
+  margin-top: 26px;
+}
+
+.gratitude-card {
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.gratitude-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 5px 0;
+  font-size: 13px;
+}
+
+.gratitude-num {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  color: var(--accent-2);
+  font-size: 15px;
+  min-width: 18px;
+  flex-shrink: 0;
+}
+
+.gratitude-text {
+  flex: 1;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-primary);
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  cursor: text;
+  min-height: 1em;
+  line-height: 1.5;
+}
+
+.gratitude-text:hover { background: var(--hover-bg); }
+.gratitude-text:focus { background: var(--focus-bg); }
+.gratitude-text:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-very-faint);
+  pointer-events: none;
+  font-style: italic;
+}
+
+.gratitude-row .row-delete { font-size: 14px; align-self: center; }
+
+@media (max-width: 460px) {
+  .gratitude-card { padding: 12px 14px; }
+  .gratitude-row { padding: 4px 0; gap: 10px; }
+}
+
+.verse-row {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 0.5px solid rgba(46,37,28,0.15);
+}
+
+.verse, .editable {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: background .12s;
+  cursor: text;
+}
+.verse {
+  font-size: 14px;
+  color: var(--ink-faint);
+  line-height: 1.5;
+  display: inline-block;
+  min-width: 200px;
+}
+.verse:hover, .editable:hover { background: var(--hover-bg); }
+.verse:focus, .editable:focus { background: var(--focus-bg); color: var(--ink-primary); }
+.verse:empty::before, .editable:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-very-faint);
+  pointer-events: none;
+}
+
+.breadcrumb {
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+.breadcrumb-item {
+  cursor: pointer;
+  transition: color .15s, background .15s;
+  padding: 2px 4px;
+  margin: 0 -2px;
+  border-radius: 3px;
+}
+.breadcrumb-item:hover { color: var(--accent-2); background: rgba(176, 117, 112, 0.08); }
+.breadcrumb-sep { margin: 0 4px; color: var(--ink-very-faint); }
+
+.back-button {
+  font-size: 12px;
+  color: var(--accent-2);
+  cursor: pointer;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-right: 10px;
+  border: 0.5px solid rgba(176, 117, 112, 0.4);
+  background: rgba(176, 117, 112, 0.06);
+  transition: all .15s;
+  user-select: none;
+}
+.back-button:hover {
+  background: rgba(176, 117, 112, 0.16);
+  border-color: var(--accent-2);
+}
+
+.title-display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--ink-primary);
+  outline: none;
+  cursor: text;
+  border-radius: 4px;
+  padding: 0 4px;
+  margin: 0 -4px;
+}
+.title-display:hover { background: var(--hover-bg); }
+.title-display:focus { background: var(--focus-bg); }
+.title-display.smaller { font-size: 38px; }
+
+.title-row { display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px; flex-wrap: wrap; }
+.title-status { font-size: 12px; color: var(--accent-1); }
+.subtitle { font-size: 13px; color: var(--ink-secondary); margin-bottom: 6px; }
+.section-label { font-size: 11px; color: var(--ink-faint); font-weight: 500; margin-bottom: 10px; letter-spacing: 0.2px; }
+
+.year-section { margin-bottom: 22px; }
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.month-card {
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color .15s, transform .1s;
+  position: relative;
+}
+.month-card:hover { border-color: var(--card-border-strong); }
+.month-card:active { transform: translateY(1px); }
+.month-card.active {
+  background: var(--card-active-bg);
+  border: 1px solid var(--accent-1);
+}
+.month-card.future {
+  background: rgba(245, 235, 210, 0.5);
+  border: 0.5px dashed rgba(176, 117, 112, 0.4);
+}
+
+.month-card-badge {
+  position: absolute; top: 9px; right: 11px;
+  font-size: 11px; color: var(--accent-1);
+}
+
+.month-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 21px;
+  color: var(--ink-primary);
+  margin-bottom: 8px;
+}
+.month-name.muted { color: var(--ink-secondary); }
+
+.bar {
+  background: rgba(46,37,28,0.08);
+  height: 4px; border-radius: 2px; overflow: hidden;
+  margin-bottom: 8px;
+}
+.bar-fill { height: 100%; background: var(--accent-1); transition: width .3s; }
+.bar-thin { height: 3px; }
+.bar-empty { background: rgba(46,37,28,0.05); }
+
+.month-stats {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--ink-secondary);
+}
+
+.future-summary {
+  font-size: 11px;
+  color: var(--accent-2);
+  margin-bottom: 4px;
+}
+.future-list {
+  font-size: 11px;
+  color: var(--ink-secondary);
+  line-height: 1.55;
+}
+.future-add {
+  font-size: 11px;
+  color: var(--accent-2);
+  margin-top: 2px;
+}
+
+.detail-section {
+  border-top: 0.5px solid rgba(46, 37, 28, 0.2);
+  padding-top: 24px;
+  margin-top: 4px;
+}
+
+.weeks-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.week-card {
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 6px;
+  padding: 12px 13px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.week-card:hover { border-color: var(--card-border-strong); }
+.week-card.active { background: var(--card-active-bg); border: 1px solid var(--accent-1); }
+.week-card.future { background: rgba(245, 235, 210, 0.5); border: 0.5px dashed rgba(176, 117, 112, 0.4); }
+
+.week-label { font-size: 11px; color: var(--ink-secondary); margin-bottom: 4px; }
+.week-label.active { color: var(--accent-1); }
+.week-label.muted { color: var(--ink-faint); }
+.week-range { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 14px; color: var(--ink-primary); margin-bottom: 8px; }
+.week-range.muted { color: var(--ink-secondary); }
+
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.kanban-col-header {
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 0.5px solid rgba(46,37,28,0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kanban-col-header.demleniyor { color: var(--accent-2); }
+.kanban-col-header.paylasildi { color: var(--accent-1); }
+
+.idea-card {
+  background: var(--card-bg);
+  border-radius: 5px;
+  padding: 10px 11px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: background .15s;
+}
+.idea-card:hover { background: rgba(46,37,28,0.09); }
+.idea-card.published { background: var(--card-active-bg); }
+
+.idea-title {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-primary);
+  outline: none;
+  cursor: text;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+}
+.idea-title:focus { background: var(--focus-bg); }
+.idea-date { font-size: 11px; color: var(--ink-faint); margin-top: 3px; }
+.idea-date.published { color: var(--accent-1); }
+
+.idea-card-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.status-select {
+  font-size: 10.5px;
+  background: transparent;
+  border: 0.5px solid var(--card-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.idea-delete {
+  font-size: 12px;
+  color: var(--ink-very-faint);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.idea-card:hover .idea-delete { opacity: 0.6; }
+.idea-delete:hover { opacity: 1; color: var(--accent-2); }
+
+.add-button {
+  font-size: 12px;
+  color: var(--accent-2);
+  cursor: pointer;
+  margin-top: 4px;
+  padding: 3px 5px;
+  border-radius: 3px;
+  display: inline-block;
+  user-select: none;
+}
+.add-button:hover { background: rgba(176, 117, 112, 0.1); }
+
+.row-item {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 7px;
+  font-size: 13px;
+  color: var(--ink-primary);
+}
+
+.checkbox {
+  width: 14px; height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  cursor: pointer;
+  background: rgba(245, 235, 210, 0.6);
+  border: 1px solid var(--ink-very-faint);
+  transition: all .15s;
+}
+.checkbox.checked {
+  background: var(--accent-1);
+  border-color: var(--accent-1);
+}
+
+.row-text {
+  flex: 1;
+  cursor: text;
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  font-family: inherit;
+}
+.row-text:hover { background: var(--hover-bg); }
+.row-text:focus { background: var(--focus-bg); }
+.row-item.done .row-text { color: var(--ink-faint); text-decoration: line-through; }
+
+.row-delete {
+  opacity: 0;
+  font-size: 13px;
+  color: var(--ink-very-faint);
+  cursor: pointer;
+  padding: 0 4px;
+  transition: opacity .15s, color .15s;
+  user-select: none;
+}
+.row-item:hover .row-delete { opacity: 0.6; }
+.row-delete:hover { color: var(--accent-2); opacity: 1 !important; }
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.three-col {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr 1fr;
+  gap: 16px;
+}
+
+.intent-card {
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+}
+
+.intent-label {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--accent-2);
+  margin-bottom: 6px;
+}
+
+.intent-text {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-primary);
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  min-height: 1.6em;
+}
+.intent-text:hover { background: var(--hover-bg); }
+.intent-text:focus { background: var(--focus-bg); }
+.intent-text:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-very-faint);
+  pointer-events: none;
+}
+
+.meal-table {
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.meal-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 1fr 1fr;
+  border-bottom: 0.5px solid rgba(46,37,28,0.1);
+}
+.meal-row.with-snack {
+  grid-template-columns: 36px 1fr 1fr 1fr 0.85fr;
+}
+.meal-row:last-child { border-bottom: none; }
+
+.meal-row.header {
+  background: rgba(46,37,28,0.04);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+.meal-row.header > div { padding: 7px 10px; }
+.meal-row.header .snack-col { color: var(--accent-2); }
+
+.meal-cell {
+  padding: 7px 10px;
+  font-size: 12px;
+  color: var(--ink-primary);
+  outline: none;
+  cursor: text;
+  border-radius: 0;
+  min-width: 0;
+}
+.meal-cell:hover { background: var(--hover-bg); }
+.meal-cell:focus { background: var(--focus-bg); }
+.meal-cell.day-header {
+  font-weight: 500;
+  color: var(--ink-secondary);
+  cursor: default;
+  padding: 7px 10px 7px 12px;
+}
+.meal-cell.day-header.today { color: var(--accent-1); }
+.meal-cell:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-very-faint);
+  pointer-events: none;
+  font-style: italic;
+}
+
+.meal-toggle-btn {
+  font-size: 11px;
+  color: var(--accent-2);
+  margin-top: 8px;
+  cursor: pointer;
+  display: inline-block;
+}
+.meal-toggle-btn:hover { background: rgba(176, 117, 112, 0.1); border-radius: 3px; padding: 2px 5px; margin-left: -5px; }
+
+.days-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 7px;
+  margin-bottom: 8px;
+}
+
+.day-card {
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 6px;
+  padding: 12px 13px;
+  cursor: pointer;
+  transition: border-color .15s;
+  text-align: left;
+}
+.day-card:hover { border-color: var(--card-border-strong); }
+.day-card.today {
+  background: var(--card-active-bg);
+  border: 1px solid var(--accent-1);
+}
+
+.day-name { font-size: 11px; color: var(--ink-secondary); margin-bottom: 2px; }
+.day-name.today { color: var(--accent-1); }
+.day-num {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--ink-primary);
+}
+.day-status { font-size: 11px; margin-top: 5px; color: var(--ink-secondary); }
+.day-status.done { color: var(--accent-1); }
+.day-status.today { color: var(--accent-1); }
+
+.workout-card {
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 6px;
+  padding: 14px 15px;
+  min-height: 130px;
+}
+
+.workout-hint {
+  font-size: 11px;
+  color: var(--accent-2);
+  margin-bottom: 8px;
+}
+
+.workout-text {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-primary);
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  min-height: 4em;
+  white-space: pre-wrap;
+}
+.workout-text:hover { background: var(--hover-bg); }
+.workout-text:focus { background: var(--focus-bg); }
+.workout-text:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-very-faint);
+  pointer-events: none;
+}
+
+.reading-card {
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+
+.book-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--ink-primary);
+  outline: none;
+  border-radius: 3px;
+  padding: 0 4px;
+  margin: 0 -4px 2px;
+  cursor: text;
+}
+.book-title:hover { background: var(--hover-bg); }
+.book-title:focus { background: var(--focus-bg); }
+.book-title:empty::before { content: attr(data-placeholder); color: var(--ink-very-faint); }
+
+.book-author {
+  font-size: 11px;
+  color: var(--ink-secondary);
+  margin-bottom: 12px;
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: 0 -4px 12px;
+  cursor: text;
+}
+.book-author:hover { background: var(--hover-bg); }
+.book-author:focus { background: var(--focus-bg); }
+.book-author:empty::before { content: attr(data-placeholder); color: var(--ink-very-faint); font-style: italic; }
+
+.book-progress { background: rgba(46,37,28,0.1); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+.book-progress-fill { height: 100%; background: var(--accent-1); transition: width .3s; }
+
+.book-pages {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ink-secondary);
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.page-input {
+  background: transparent;
+  border: none;
+  border-bottom: 0.5px dashed var(--ink-very-faint);
+  width: 38px;
+  text-align: center;
+  font-size: 11px;
+  outline: none;
+  color: var(--ink-primary);
+  font-family: inherit;
+  padding: 1px 2px;
+}
+.page-input:focus { border-bottom-color: var(--accent-1); }
+
+.book-today {
+  border-top: 0.5px solid rgba(46,37,28,0.15);
+  padding-top: 10px;
+  margin-top: 6px;
+}
+.book-today-pages {
+  font-size: 12px;
+  color: var(--ink-primary);
+  margin-bottom: 4px;
+}
+.book-today-note {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  min-height: 1.5em;
+}
+.book-today-note:hover { background: var(--hover-bg); }
+.book-today-note:focus { background: var(--focus-bg); color: var(--ink-primary); }
+.book-today-note:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-very-faint);
+  pointer-events: none;
+}
+
+.wishes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.wish-cat-card {
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+
+.wish-cat-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--accent-2);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 0.5px solid rgba(46, 37, 28, 0.12);
+}
+
+.wish-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-primary);
+  margin-bottom: 5px;
+  padding: 1px 0;
+}
+
+.wish-text {
+  flex: 1;
+  cursor: text;
+  outline: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+}
+.wish-text:hover { background: var(--hover-bg); }
+.wish-text:focus { background: var(--focus-bg); }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(46, 37, 28, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--paper);
+  border: 0.5px solid rgba(46, 37, 28, 0.3);
+  border-radius: 8px;
+  padding: 28px 30px;
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+}
+
+.modal-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 28px;
+  color: var(--ink-primary);
+  margin-bottom: 6px;
+}
+
+.modal-sub {
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin-bottom: 22px;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.color-row label {
+  font-size: 13px;
+  color: var(--ink-secondary);
+  width: 90px;
+}
+
+.color-row input[type="color"] {
+  width: 36px;
+  height: 36px;
+  border: 0.5px solid var(--card-border);
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.color-row input[type="text"] {
+  flex: 1;
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 5px;
+  padding: 8px 10px;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+}
+
+.color-row input[type="text"]:focus { border-color: var(--accent-1); }
+
+.modal-preview {
+  background: var(--paper);
+  border: 0.5px solid var(--card-border);
+  border-radius: 5px;
+  padding: 12px 14px;
+  margin: 18px 0;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.modal-preview-dot { width: 14px; height: 14px; border-radius: 50%; }
+.modal-preview-text { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 14px; }
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 0.5px solid var(--card-border);
+  background: transparent;
+  color: var(--ink-primary);
+  transition: all .15s;
+  font-family: inherit;
+}
+.btn:hover { background: var(--hover-bg); border-color: var(--card-border-strong); }
+.btn.primary {
+  background: var(--accent-1);
+  color: var(--paper);
+  border-color: var(--accent-1);
+}
+.btn.primary:hover { opacity: 0.92; }
+.btn.danger {
+  color: var(--accent-2);
+  border-color: var(--accent-2);
+}
+.btn.danger:hover { background: rgba(176, 117, 112, 0.1); }
+
+.footer-actions {
+  margin-top: 36px;
+  padding-top: 16px;
+  border-top: 0.5px solid rgba(46, 37, 28, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+.footer-link {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 3px;
+  transition: background .15s, color .15s;
+  user-select: none;
+}
+.footer-link:hover { background: var(--hover-bg); color: var(--ink-primary); }
+.footer-link.danger:hover { color: var(--accent-2); background: rgba(176, 117, 112, 0.1); }
+.footer-sep { color: var(--ink-very-faint); margin: 0 2px; }
+.footer-info {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: var(--ink-very-faint);
+  font-style: italic;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+@media (max-width: 460px) {
+  .footer-info { display: none; }
+}
+
+.brand-edit-inline {
+  outline: none;
+  border-radius: 3px;
+  padding: 1px 3px;
+  margin: -1px -3px;
+  cursor: text;
+}
+.brand-edit-inline:hover { background: var(--hover-bg); }
+.brand-edit-inline:focus { background: var(--focus-bg); }
+
+.empty-state {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  color: var(--ink-very-faint);
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+@media (max-width: 960px) {
+  .paper { padding: 28px 24px 32px 56px; max-width: none; }
+  .month-grid { grid-template-columns: repeat(3, 1fr); }
+  .kanban { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 720px) {
+  body { font-size: 13px; line-height: 1.5; }
+  .page-bg { padding: 16px 10px 40px; }
+  .paper {
+    padding: 22px 18px 28px 42px;
+    border-radius: 4px;
+  }
+  .margin-line { left: 28px; top: 16px; bottom: 16px; }
+
+  .header-band {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .brand { flex-wrap: wrap; gap: 9px; }
+  .brand-name, .brand-tagline { font-size: 13px; }
+  .theme-picker { flex-wrap: wrap; gap: 4px; }
+
+  .title-display { font-size: 32px; }
+  .title-display.smaller { font-size: 26px; }
+
+  .verse { font-size: 13px; }
+
+  .month-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .month-card { padding: 11px 12px; }
+  .month-name { font-size: 19px; }
+
+  .kanban { grid-template-columns: 1fr; gap: 14px; }
+  .kanban-col-header { padding-bottom: 4px; margin-bottom: 6px; }
+
+  .three-col { grid-template-columns: 1fr; gap: 18px; }
+  .two-col { grid-template-columns: 1fr; gap: 16px; }
+
+  .wishes-grid { grid-template-columns: 1fr; }
+
+  .weeks-row { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+
+  /* Yemek tablosu yatayda kayar */
+  .meal-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-left: -4px;
+    margin-right: -4px;
+    padding: 0 4px 4px;
+  }
+  .meal-table { overflow: visible; }
+  .meal-row { min-width: 480px; }
+  .meal-row.with-snack { min-width: 560px; }
+
+  /* Dokunmatik için büyütülmüş kutucuklar */
+  .checkbox { width: 18px; height: 18px; }
+  .row-item { margin-bottom: 10px; gap: 11px; }
+  .row-text, .wish-text { padding: 4px 5px; }
+
+  .add-button { padding: 5px 9px; font-size: 13px; }
+  .row-delete, .idea-delete { font-size: 16px; padding: 4px 6px; opacity: 0.7; }
+
+  .back-button { font-size: 13px; padding: 6px 12px; }
+  .breadcrumb-item { padding: 3px 5px; }
+
+  .day-card { padding: 10px 8px; }
+  .day-num { font-size: 17px; }
+
+  .modal { padding: 22px 20px; max-width: 92vw; }
+  .modal-title { font-size: 24px; }
+  .color-row { flex-wrap: wrap; }
+  .color-row label { width: 100%; margin-bottom: 4px; }
+}
+
+@media (max-width: 460px) {
+  .paper { padding: 18px 14px 24px 34px; }
+  .margin-line { left: 22px; }
+
+  .title-display { font-size: 26px; }
+  .title-display.smaller { font-size: 22px; }
+
+  /* iPhone 14 Plus ve benzeri genişlikte 2 kolon ay grid */
+  .month-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .month-card { padding: 10px 11px; }
+  .month-name { font-size: 18px; }
+
+  /* Günler tek kolonda yatayda */
+  .days-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .day-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    text-align: left;
+  }
+  .day-card > * { display: inline-block; }
+  .day-name { margin-right: 0; min-width: 32px; }
+  .day-num { font-size: 18px; min-width: 28px; text-align: center; }
+  .day-status { font-size: 12px; min-width: 60px; text-align: right; }
+
+  /* Header band daha kompakt */
+  .theme-picker-label { display: none; }
+
+  /* Hafta kartları tek kolonda */
+  .weeks-row { grid-template-columns: 1fr; }
+  .week-card { padding: 10px 12px; }
+
+  .verse { font-size: 12.5px; }
+  .breadcrumb { font-size: 11.5px; }
+  .breadcrumb-item, .breadcrumb-sep { padding: 3px 4px; }
+  .back-button { padding: 7px 14px; font-size: 13px; }
+
+  /* Footer butonları parmağa uygun */
+  .footer-actions { flex-wrap: wrap; gap: 8px; }
+  .footer-link { padding: 8px 12px; font-size: 12px; }
+}
+
+.info-block {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.day-card-text {
+  display: block;
+}
+
+.kanban-count {
+  font-size: 10.5px;
+  color: var(--ink-very-faint);
+  font-weight: 400;
+}
+</style>
+</head>
+<body>
+
+<div class="page-bg">
+  <div class="paper" id="paper">
+    <div class="margin-line"></div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<div id="modal-host"></div>
+
+<script>
+'use strict';
+
+const STORAGE_KEY = 'ebbsWorld_v1';
+
+const PRESET_THEMES = [
+  { name: 'Sage Mead',     paper: '#F0E5CD', accent1: '#6B8A4F', accent2: '#B07570' },
+  { name: 'Autumn Embers', paper: '#EDDFC0', accent1: '#B8702E', accent2: '#8B3A2A' },
+  { name: 'Twilight Ink',  paper: '#E8E2D1', accent1: '#3A4A6E', accent2: '#7B6E8B' },
+  { name: 'Forest Walk',   paper: '#EBE4CD', accent1: '#4A6E3D', accent2: '#A77555' }
+];
+
+const MONTHS_TR = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_TR_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DAYS_TR_SHORT = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAYS_TR_LONG = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+const STATUSES = [
+  { id: 'fikir',       label: 'Idea' },
+  { id: 'demleniyor',  label: 'Brewing' },
+  { id: 'cekildi',     label: 'Captured' },
+  { id: 'paylasildi',  label: 'Shared' }
+];
+
+function uid() { return Math.random().toString(36).slice(2, 10); }
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function dateKey(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+function parseDateKey(s) { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
+function monthKey(year, month) { return year + '-' + pad(month+1); }
+
+function getMonday(d) {
+  const date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = date.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  date.setDate(date.getDate() + diff);
+  return date;
+}
+
+function getISOWeek(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
+
+function weekKey(d) {
+  const monday = getMonday(d);
+  const wn = getISOWeek(monday);
+  return monday.getFullYear() + '-W' + pad(wn);
+}
+
+function daysInMonth(year, month) { return new Date(year, month+1, 0).getDate(); }
+
+function defaultState() {
+  return {
+    meta: {
+      name: "Ebb's World",
+      tagline: 'creating moments of joy',
+      initial: 'E',
+      activeTheme: 'Sage Mead',
+      customThemes: [],
+      globalVerse: '',
+      fontSize: 'medium'
+    },
+    months: {},
+    weeks: {},
+    days: {},
+    books: []
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    const fresh = defaultState();
+    return Object.assign({}, fresh, parsed, {
+      meta: Object.assign({}, fresh.meta, parsed.meta || {}),
+      months: parsed.months || {},
+      weeks: parsed.weeks || {},
+      days: parsed.days || {},
+      books: parsed.books || []
+    });
+  } catch (e) {
+    return defaultState();
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    return true;
+  } catch (e) {
+    console.error('Save failed:', e);
+    showToast('save error, ' + e.message, 'error');
+    return false;
+  }
+}
+
+function getMonthData(year, month) {
+  const k = monthKey(year, month);
+  if (!state.months[k]) state.months[k] = {};
+  const md = state.months[k];
+  if (!Array.isArray(md.contentIdeas)) md.contentIdeas = [];
+  if (!Array.isArray(md.wishes)) md.wishes = [];
+  if (typeof md.verse !== 'string') md.verse = '';
+  if (!Array.isArray(md.gratitude)) md.gratitude = [];
+  return md;
+}
+
+function getWeekData(d) {
+  const k = weekKey(d);
+  if (!state.weeks[k]) state.weeks[k] = {};
+  const wd = state.weeks[k];
+  if (typeof wd.intent !== 'string') wd.intent = '';
+  if (!Array.isArray(wd.goals)) wd.goals = [];
+  if (typeof wd.meals !== 'object' || !wd.meals) wd.meals = {};
+  if (typeof wd.showSnack !== 'boolean') wd.showSnack = true;
+  if (typeof wd.verse !== 'string') wd.verse = '';
+  if (!Array.isArray(wd.gratitude)) wd.gratitude = [];
+  return wd;
+}
+
+function getDayData(d) {
+  const k = dateKey(d);
+  if (!state.days[k]) state.days[k] = {};
+  const dd = state.days[k];
+  if (!Array.isArray(dd.todos)) dd.todos = [];
+  if (typeof dd.workout !== 'string') dd.workout = '';
+  if (typeof dd.reading !== 'object' || !dd.reading) dd.reading = { bookId: null, todayPages: '', note: '' };
+  if (typeof dd.verse !== 'string') dd.verse = '';
+  if (!Array.isArray(dd.gratitude)) dd.gratitude = [];
+  return dd;
+}
+
+function getActiveBook() {
+  return state.books.find(b => b.active) || state.books[0] || null;
+}
+
+function getAllThemes() { return [...PRESET_THEMES, ...state.meta.customThemes]; }
+
+function getActiveTheme() {
+  return getAllThemes().find(t => t.name === state.meta.activeTheme) || PRESET_THEMES[0];
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace('#','');
+  if (hex.length === 3) hex = hex.split('').map(c => c+c).join('');
+  return { r: parseInt(hex.slice(0,2),16), g: parseInt(hex.slice(2,4),16), b: parseInt(hex.slice(4,6),16) };
+}
+
+function mix(c1, c2, t) {
+  const a = hexToRgb(c1), b = hexToRgb(c2);
+  const r = Math.round(a.r*(1-t) + b.r*t);
+  const g = Math.round(a.g*(1-t) + b.g*t);
+  const bl = Math.round(a.b*(1-t) + b.b*t);
+  return 'rgb(' + r + ',' + g + ',' + bl + ')';
+}
+
+function applyTheme() {
+  const t = getActiveTheme();
+  const root = document.documentElement;
+  root.style.setProperty('--paper', t.paper);
+  root.style.setProperty('--accent-1', t.accent1);
+  root.style.setProperty('--accent-2', t.accent2);
+  const cardBg = mix(t.paper, '#2E251C', 0.06);
+  const activeBg = mix(t.paper, t.accent1, 0.22);
+  root.style.setProperty('--card-bg', cardBg);
+  root.style.setProperty('--card-active-bg', activeBg);
+}
+
+function applyFontSize() {
+  const size = (state.meta && state.meta.fontSize) || 'medium';
+  document.body.classList.remove('font-small', 'font-medium', 'font-large');
+  document.body.classList.add('font-' + size);
+}
+
+function showToast(message, type) {
+  let toast = document.getElementById('app-toast');
+  if (toast) toast.remove();
+  toast = document.createElement('div');
+  toast.id = 'app-toast';
+  toast.className = 'app-toast' + (type === 'error' ? ' error' : '');
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add('visible'), 10);
+  setTimeout(() => {
+    toast.classList.remove('visible');
+    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+  }, 2200);
+}
+
+let viewState = (function() {
+  const today = new Date();
+  return {
+    level: 'year',
+    year: today.getFullYear(),
+    monthIndex: today.getMonth(),
+    weekDate: getMonday(today),
+    dayDate: today
+  };
+})();
+
+let state = loadState();
+
+function el(tag, props, children) {
+  const e = document.createElement(tag);
+  if (props) {
+    for (const k in props) {
+      if (k === 'class') e.className = props[k];
+      else if (k === 'html') e.innerHTML = props[k];
+      else if (k === 'text') e.textContent = props[k];
+      else if (k.startsWith('on') && typeof props[k] === 'function') {
+        e.addEventListener(k.slice(2).toLowerCase(), props[k]);
+      } else if (k === 'data') {
+        for (const dk in props[k]) e.dataset[dk] = props[k][dk];
+      } else if (k === 'style' && typeof props[k] === 'object') {
+        Object.assign(e.style, props[k]);
+      } else {
+        e.setAttribute(k, props[k]);
+      }
+    }
+  }
+  if (children) {
+    if (!Array.isArray(children)) children = [children];
+    children.forEach(c => {
+      if (c == null || c === false) return;
+      if (typeof c === 'string' || typeof c === 'number') e.appendChild(document.createTextNode(c));
+      else e.appendChild(c);
+    });
+  }
+  return e;
+}
+
+function bindEditable(node, getter, setter, opts) {
+  opts = opts || {};
+  node.contentEditable = 'true';
+  node.spellcheck = false;
+  node.textContent = getter() || '';
+  node.addEventListener('blur', () => {
+    const val = (node.textContent || '').replace(/\s+/g,' ').trim();
+    setter(val);
+    saveState();
+  });
+  if (!opts.multiline) {
+    node.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); node.blur(); }
+      if (e.key === 'Escape') { node.textContent = getter() || ''; node.blur(); }
+    });
+  } else {
+    node.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { node.textContent = getter() || ''; node.blur(); }
+    });
+  }
+  return node;
+}
+
+function renderThemeDropdown() {
+  const wrap = document.createElement('div');
+  wrap.className = 'theme-dropdown-wrap';
+
+  const t = getActiveTheme();
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'theme-button';
+
+  const dots = document.createElement('span');
+  dots.className = 'theme-button-dots';
+  [t.paper, t.accent1, t.accent2].forEach((c, i) => {
+    const d = document.createElement('span');
+    d.className = 'theme-dot' + (i === 0 ? ' bordered' : '');
+    d.style.background = c;
+    dots.appendChild(d);
+  });
+  btn.appendChild(dots);
+
+  const lbl = document.createElement('span');
+  lbl.textContent = 'theme, ' + t.name;
+  btn.appendChild(lbl);
+
+  let dropdown = null;
+  let outsideHandler = null;
+
+  function close() {
+    if (dropdown && dropdown.parentNode) dropdown.parentNode.removeChild(dropdown);
+    dropdown = null;
+    if (outsideHandler) {
+      document.removeEventListener('mousedown', outsideHandler);
+      outsideHandler = null;
+    }
+  }
+
+  function open() {
+    dropdown = buildThemeDropdownPanel(close);
+    wrap.appendChild(dropdown);
+    setTimeout(() => {
+      outsideHandler = (e) => {
+        const modalHost = document.getElementById('modal-host');
+        if (!wrap.contains(e.target) && !(modalHost && modalHost.contains(e.target))) {
+          close();
+        }
+      };
+      document.addEventListener('mousedown', outsideHandler);
+    }, 0);
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (dropdown) close();
+    else open();
+  });
+
+  wrap.appendChild(btn);
+  return wrap;
+}
+
+function buildThemeDropdownPanel(closeFn) {
+  const panel = document.createElement('div');
+  panel.className = 'theme-dropdown';
+
+  const presetSection = document.createElement('div');
+  presetSection.className = 'theme-dropdown-section';
+  presetSection.textContent = 'preset themes';
+  panel.appendChild(presetSection);
+
+  PRESET_THEMES.forEach(t => panel.appendChild(buildThemeOption(t, false, closeFn)));
+
+  if (state.meta.customThemes && state.meta.customThemes.length > 0) {
+    const div1 = document.createElement('div');
+    div1.className = 'theme-dropdown-divider';
+    panel.appendChild(div1);
+
+    const customSection = document.createElement('div');
+    customSection.className = 'theme-dropdown-section';
+    customSection.textContent = 'your themes';
+    panel.appendChild(customSection);
+
+    state.meta.customThemes.forEach(t => panel.appendChild(buildThemeOption(t, true, closeFn)));
+  }
+
+  const div2 = document.createElement('div');
+  div2.className = 'theme-dropdown-divider';
+  panel.appendChild(div2);
+
+  const addNew = document.createElement('div');
+  addNew.className = 'theme-add-new';
+  addNew.textContent = '+ create new theme';
+  addNew.onclick = () => {
+    closeFn();
+    openCustomThemeModal();
+  };
+  panel.appendChild(addNew);
+
+  return panel;
+}
+
+function buildThemeOption(t, isCustom, closeFn) {
+  const opt = document.createElement('div');
+  opt.className = 'theme-option' + (state.meta.activeTheme === t.name ? ' active' : '');
+
+  const dots = document.createElement('div');
+  dots.className = 'theme-button-dots';
+  [t.paper, t.accent1, t.accent2].forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'theme-dot' + (i === 0 ? ' bordered' : '');
+    d.style.background = c;
+    dots.appendChild(d);
+  });
+  opt.appendChild(dots);
+
+  const name = document.createElement('div');
+  name.className = 'theme-option-name';
+  name.textContent = t.name;
+  opt.appendChild(name);
+
+  if (isCustom) {
+    const edit = document.createElement('div');
+    edit.className = 'theme-option-edit';
+    edit.textContent = 'edit';
+    edit.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeFn();
+      openCustomThemeModal(t.name);
+    });
+    opt.appendChild(edit);
+  }
+
+  opt.addEventListener('click', (e) => {
+    if (e.target.classList && e.target.classList.contains('theme-option-edit')) return;
+    state.meta.activeTheme = t.name;
+    saveState();
+    applyTheme();
+    closeFn();
+    render();
+  });
+
+  return opt;
+}
+
+function renderFontSizePill() {
+  const wrap = document.createElement('div');
+  wrap.className = 'font-size-pill';
+
+  const sizes = [
+    { id: 'small', label: 'small' },
+    { id: 'medium', label: 'medium' },
+    { id: 'large', label: 'large' }
+  ];
+
+  const current = (state.meta && state.meta.fontSize) || 'medium';
+
+  sizes.forEach(s => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'font-size-button' + (current === s.id ? ' active' : '');
+    b.textContent = s.label;
+    b.addEventListener('click', () => {
+      state.meta.fontSize = s.id;
+      saveState();
+      applyFontSize();
+      render();
+    });
+    wrap.appendChild(b);
+  });
+
+  return wrap;
+}
+
+function renderHeaderBand() {
+  const avatar = el('div', { class: 'avatar' });
+  bindEditable(avatar, () => state.meta.initial, v => state.meta.initial = (v || 'E').slice(0,1));
+
+  const nameSpan = el('span', { class: 'brand-name brand-edit-inline' });
+  bindEditable(nameSpan, () => state.meta.name, v => state.meta.name = v || "Ebb's World");
+
+  const tagline = el('span', { class: 'brand-tagline brand-edit-inline' });
+  bindEditable(tagline, () => state.meta.tagline, v => state.meta.tagline = v);
+
+  const themePicker = document.createElement('div');
+  themePicker.className = 'theme-picker';
+  themePicker.appendChild(renderThemeDropdown());
+  themePicker.appendChild(renderFontSizePill());
+
+  return el('div', { class: 'header-band' }, [
+    el('div', { class: 'brand' }, [ avatar, nameSpan, tagline ]),
+    themePicker
+  ]);
+}
+
+function renderGlobalVerse() {
+  const verseSpan = el('span', { class: 'verse', data: { placeholder: '{ a verse here }' } });
+  bindEditable(verseSpan, () => state.meta.globalVerse, v => state.meta.globalVerse = v);
+  return el('div', { class: 'verse-row' }, [verseSpan]);
+}
+
+function renderBreadcrumb() {
+  const items = [];
+
+  // Geri butonu, year haricinde her görünümde görünür
+  if (viewState.level !== 'year') {
+    let backLevel;
+    let backLabel;
+    if (viewState.level === 'month') { backLevel = 'year'; backLabel = 'back, year'; }
+    else if (viewState.level === 'week') { backLevel = 'month'; backLabel = 'back, ' + MONTHS_TR[viewState.monthIndex]; }
+    else if (viewState.level === 'day') { backLevel = 'week'; backLabel = 'back, week'; }
+    items.push(el('span', {
+      class: 'back-button',
+      text: backLabel,
+      onclick: () => { viewState.level = backLevel; render(); }
+    }));
+  }
+
+  items.push(el('span', { class: 'breadcrumb-item', text: viewState.year, onclick: () => { viewState.level = 'year'; render(); } }));
+  if (viewState.level === 'month' || viewState.level === 'week' || viewState.level === 'day') {
+    items.push(el('span', { class: 'breadcrumb-sep', text: '/' }));
+    items.push(el('span', { class: 'breadcrumb-item', text: MONTHS_TR[viewState.monthIndex], onclick: () => { viewState.level = 'month'; render(); } }));
+  }
+  if (viewState.level === 'week' || viewState.level === 'day') {
+    const wn = getISOWeek(viewState.weekDate);
+    items.push(el('span', { class: 'breadcrumb-sep', text: '/' }));
+    items.push(el('span', { class: 'breadcrumb-item', text: 'Week ' + wn, onclick: () => { viewState.level = 'week'; render(); } }));
+  }
+  if (viewState.level === 'day') {
+    items.push(el('span', { class: 'breadcrumb-sep', text: '/' }));
+    items.push(el('span', { class: 'breadcrumb-item', text: DAYS_TR_LONG[(viewState.dayDate.getDay()+6)%7] }));
+  }
+  return el('div', { class: 'breadcrumb' }, items);
+}
+
+function monthDensity(year, month) {
+  const days = daysInMonth(year, month);
+  let filled = 0, goalsDone = 0, goalsTotal = 0;
+  for (let d = 1; d <= days; d++) {
+    const dt = new Date(year, month, d);
+    const dk = dateKey(dt);
+    const dd = state.days[dk];
+    if (dd) {
+      const has = (dd.todos && dd.todos.length) || (dd.workout && dd.workout.trim()) || (dd.reading && (dd.reading.todayPages || dd.reading.note));
+      if (has) filled++;
+    }
+  }
+  // Count week goals that fall in this month
+  for (const wk in state.weeks) {
+    const w = state.weeks[wk];
+    if (w.goals && w.goals.length) {
+      // Determine if this week is in the month: parse W key
+      const m = wk.match(/^(\d{4})-W(\d+)$/);
+      if (m) {
+        const y = parseInt(m[1], 10);
+        const wn = parseInt(m[2], 10);
+        // Reconstruct Monday of that week
+        const jan4 = new Date(y, 0, 4);
+        const j4Mon = getMonday(jan4);
+        const monday = new Date(j4Mon.getTime() + (wn-1)*7*86400000);
+        if (monday.getFullYear() === year && monday.getMonth() === month) {
+          goalsTotal += w.goals.length;
+          goalsDone += w.goals.filter(g => g.done).length;
+        }
+      }
+    }
+  }
+  return { filled, total: days, goalsDone, goalsTotal };
+}
+
+function renderYearView() {
+  const wrap = el('div');
+
+  const yearNavLeft = el('span', { class: 'breadcrumb-item', text: 'previous', style: 'font-family:Lora,serif;font-style:normal;font-size:11px;color:var(--ink-faint);margin-right:14px;cursor:pointer;vertical-align:middle;', onclick: () => { viewState.year--; render(); } });
+  const yearNavRight = el('span', { class: 'breadcrumb-item', text: 'next', style: 'font-family:Lora,serif;font-style:normal;font-size:11px;color:var(--ink-faint);margin-left:14px;cursor:pointer;vertical-align:middle;', onclick: () => { viewState.year++; render(); } });
+  const yearTitle = el('div', { class: 'year-section' }, [
+    el('div', { class: 'section-label', text: 'Year' }),
+    el('div', { class: 'title-display' }, [
+      yearNavLeft,
+      String(viewState.year),
+      yearNavRight
+    ])
+  ]);
+  wrap.appendChild(yearTitle);
+
+  const today = new Date();
+  const grid = el('div', { class: 'month-grid' });
+  for (let m = 0; m < 12; m++) {
+    const isCurrent = (viewState.year === today.getFullYear() && m === today.getMonth());
+    const isFuture = (viewState.year > today.getFullYear()) || (viewState.year === today.getFullYear() && m > today.getMonth());
+    const isPast = !isCurrent && !isFuture;
+
+    const card = el('div', {
+      class: 'month-card' + (isCurrent ? ' active' : '') + (isFuture ? ' future' : ''),
+      onclick: () => { viewState.monthIndex = m; viewState.level = 'month'; render(); }
+    });
+
+    if (isCurrent) card.appendChild(el('div', { class: 'month-card-badge', text: 'active' }));
+
+    card.appendChild(el('div', { class: 'month-name' + (isFuture ? ' muted' : ''), text: MONTHS_TR[m] }));
+
+    if (isFuture) {
+      const md = state.months[monthKey(viewState.year, m)];
+      const wishCount = md && md.wishes ? md.wishes.length : 0;
+      if (wishCount > 0) {
+        card.appendChild(el('div', { class: 'future-summary', text: wishCount + ' wishes' }));
+        const sample = md.wishes.slice(0, 2).map(w => (w.category ? w.category + ', ' : '') + (w.text || '')).join('  •  ');
+        card.appendChild(el('div', { class: 'future-list', text: sample, style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;' }));
+      } else {
+        card.appendChild(el('div', { class: 'future-summary', text: 'Wishes and plans', style: 'color:var(--ink-faint)' }));
+        card.appendChild(el('div', { class: 'future-add', text: '+ add' }));
+      }
+    } else {
+      const dens = monthDensity(viewState.year, m);
+      const pct = Math.round((dens.filled / dens.total) * 100);
+      const bar = el('div', { class: 'bar' }, [el('div', { class: 'bar-fill', style: 'width:' + pct + '%' })]);
+      card.appendChild(bar);
+      card.appendChild(el('div', { class: 'month-stats' }, [
+        el('span', { text: dens.filled + ' days' }),
+        el('span', { text: dens.goalsDone + ' / ' + dens.goalsTotal + ' goals' })
+      ]));
+    }
+
+    grid.appendChild(card);
+  }
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+function renderMonthView() {
+  const wrap = el('div');
+  const year = viewState.year;
+  const month = viewState.monthIndex;
+  const md = getMonthData(year, month);
+
+  const today = new Date();
+  const isFuture = (year > today.getFullYear()) || (year === today.getFullYear() && month > today.getMonth());
+  const isCurrent = (year === today.getFullYear() && month === today.getMonth());
+
+  wrap.appendChild(renderBreadcrumb());
+
+  wrap.appendChild(el('div', { class: 'title-row' }, [
+    el('div', { class: 'title-display', text: MONTHS_TR[month] }),
+    isCurrent ? el('div', { class: 'title-status', text: 'now' }) : null
+  ]));
+
+  // Month subtitle stats
+  const weeks = getWeeksOfMonth(year, month);
+  const totalIdeas = (md.contentIdeas || []).length;
+  let goalsDone = 0, goalsTotal = 0;
+  weeks.forEach(monday => {
+    const wd = state.weeks[weekKey(monday)];
+    if (wd && wd.goals) { goalsTotal += wd.goals.length; goalsDone += wd.goals.filter(g => g.done).length; }
+  });
+  wrap.appendChild(el('div', { class: 'subtitle', text: weeks.length + ' weeks, ' + totalIdeas + ' content ideas, ' + goalsDone + ' / ' + goalsTotal + ' goals' }));
+
+  const monthVerse = el('span', { class: 'verse', style: 'color:var(--accent-2);margin-bottom:22px;display:block;', data: { placeholder: '{ start of month verse }' } });
+  bindEditable(monthVerse, () => md.verse, v => md.verse = v);
+  wrap.appendChild(monthVerse);
+
+  if (isFuture) {
+    wrap.appendChild(renderWishes(md));
+  }
+
+  // Weeks
+  if (weeks.length) {
+    wrap.appendChild(el('div', { class: 'section-label', text: 'Weeks', style: 'margin-top:18px;' }));
+    const weeksWrap = el('div', { class: 'weeks-row' });
+    weeks.forEach(monday => {
+      const sunday = new Date(monday); sunday.setDate(sunday.getDate() + 6);
+      const wn = getISOWeek(monday);
+      const k = weekKey(monday);
+      const wd = state.weeks[k] || { goals: [] };
+      const goalsT = (wd.goals || []).length;
+      const goalsD = (wd.goals || []).filter(g => g.done).length;
+      const pct = goalsT ? Math.round((goalsD / goalsT) * 100) : 0;
+      const isThisWeek = (weekKey(today) === k);
+      const isFutureWeek = monday > today && !isThisWeek;
+      const card = el('div', {
+        class: 'week-card' + (isThisWeek ? ' active' : '') + (isFutureWeek ? ' future' : ''),
+        onclick: () => { viewState.weekDate = new Date(monday); viewState.level = 'week'; render(); }
+      });
+      card.appendChild(el('div', { class: 'week-label' + (isThisWeek ? ' active' : '') + (isFutureWeek ? ' muted' : ''), text: 'Week ' + wn + (isThisWeek ? ', now' : '') }));
+      card.appendChild(el('div', { class: 'week-range' + (isFutureWeek ? ' muted' : ''), text: monday.getDate() + ' ' + MONTHS_TR_SHORT[monday.getMonth()] + ', ' + sunday.getDate() + ' ' + MONTHS_TR_SHORT[sunday.getMonth()] }));
+      const bar = el('div', { class: 'bar bar-thin' + (goalsT ? '' : ' bar-empty') });
+      if (goalsT) bar.appendChild(el('div', { class: 'bar-fill', style: 'width:' + pct + '%' }));
+      card.appendChild(bar);
+      weeksWrap.appendChild(card);
+    });
+    wrap.appendChild(weeksWrap);
+  }
+
+  // Content ideas kanban
+  wrap.appendChild(el('div', { class: 'section-label', text: 'Content ideas', style: 'margin-top:24px;' }));
+  wrap.appendChild(renderKanban(md));
+
+  // Minnet
+  wrap.appendChild(renderGratitudeSection(md));
+
+  return wrap;
+}
+
+function renderGratitudeSection(holder) {
+  if (!Array.isArray(holder.gratitude)) holder.gratitude = [];
+  const list = holder.gratitude;
+
+  const wrap = el('div', { class: 'gratitude-section' });
+  wrap.appendChild(el('div', { class: 'section-label', text: 'gratitude' }));
+
+  const card = el('div', { class: 'gratitude-card' });
+  const rowCount = Math.max(3, list.length);
+
+  for (let i = 0; i < rowCount; i++) {
+    if (!list[i]) list[i] = { id: uid(), text: '' };
+    const idx = i;
+
+    const row = el('div', { class: 'gratitude-row' });
+    row.appendChild(el('span', { class: 'gratitude-num', text: (i + 1) + '.' }));
+
+    const txt = el('span', { class: 'gratitude-text', data: { placeholder: '...' } });
+    bindEditable(txt, () => list[idx].text, v => {
+      list[idx].text = v;
+      // Boş kalan ek satırları geri kaldır (ilk 3 hariç)
+      while (list.length > 3 && list[list.length - 1].text === '') list.pop();
+    });
+    row.appendChild(txt);
+
+    if (i >= 3) {
+      row.appendChild(el('span', {
+        class: 'row-delete',
+        text: '×',
+        onclick: () => {
+          list.splice(idx, 1);
+          saveState();
+          render();
+        }
+      }));
+    }
+
+    card.appendChild(row);
+  }
+
+  card.appendChild(el('div', {
+    class: 'add-button',
+    text: '+ add',
+    style: 'margin-top:6px;',
+    onclick: () => {
+      list.push({ id: uid(), text: '' });
+      saveState();
+      render();
+      setTimeout(() => {
+        const items = document.querySelectorAll('.gratitude-text');
+        if (items.length) items[items.length - 1].focus();
+      }, 0);
+    }
+  }));
+
+  wrap.appendChild(card);
+  return wrap;
+}
+
+function getWeeksOfMonth(year, month) {
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
+  const set = new Set();
+  const arr = [];
+  for (let d = new Date(first); d <= last; d.setDate(d.getDate()+1)) {
+    const m = getMonday(d);
+    const k = weekKey(m);
+    if (!set.has(k)) { set.add(k); arr.push(new Date(m)); }
+  }
+  return arr;
+}
+
+function renderKanban(md) {
+  const grid = el('div', { class: 'kanban' });
+  STATUSES.forEach(st => {
+    const col = el('div');
+    const items = (md.contentIdeas || []).filter(i => i.status === st.id);
+    const headerCls = 'kanban-col-header' + (st.id === 'demleniyor' ? ' demleniyor' : '') + (st.id === 'paylasildi' ? ' paylasildi' : '');
+    col.appendChild(el('div', { class: headerCls }, [
+      el('span', { text: st.label }),
+      el('span', { class: 'kanban-count', text: items.length })
+    ]));
+    items.forEach(item => {
+      const card = el('div', { class: 'idea-card' + (st.id === 'paylasildi' ? ' published' : '') });
+      const titleEl = el('div', { class: 'idea-title', data: { placeholder: 'idea...' } });
+      bindEditable(titleEl, () => item.title, v => item.title = v);
+      card.appendChild(titleEl);
+
+      const controls = el('div', { class: 'idea-card-controls' });
+      const sel = el('select', { class: 'status-select', onchange: e => { item.status = e.target.value; if (e.target.value === 'paylasildi' && !item.date) item.date = dateKey(new Date()); saveState(); render(); } });
+      STATUSES.forEach(s => {
+        const opt = el('option', { value: s.id, text: s.label });
+        if (s.id === item.status) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      controls.appendChild(sel);
+
+      if (item.date) {
+        const d = parseDateKey(item.date);
+        controls.appendChild(el('span', { class: 'idea-date' + (st.id === 'paylasildi' ? ' published' : ''), text: d.getDate() + ' ' + MONTHS_TR_SHORT[d.getMonth()] }));
+      } else {
+        controls.appendChild(el('span', { class: 'idea-delete', text: '×', title: 'delete', onclick: () => { md.contentIdeas = (md.contentIdeas || []).filter(x => x.id !== item.id); saveState(); render(); } }));
+      }
+      card.appendChild(controls);
+      col.appendChild(card);
+    });
+
+    col.appendChild(el('div', {
+      class: 'add-button',
+      text: '+ add',
+      onclick: () => {
+        if (!md.contentIdeas) md.contentIdeas = [];
+        md.contentIdeas.push({ id: uid(), title: '', status: st.id, date: st.id === 'paylasildi' ? dateKey(new Date()) : null });
+        saveState();
+        render();
+        setTimeout(() => {
+          const cards = document.querySelectorAll('.idea-title');
+          if (cards.length) cards[cards.length-1].focus();
+        }, 0);
+      }
+    }));
+    grid.appendChild(col);
+  });
+  return grid;
+}
+
+function renderWishes(md) {
+  const wrap = el('div');
+  wrap.appendChild(el('div', { class: 'section-label', text: 'Wishes and plans', style: 'margin-top:18px;color:var(--accent-2);' }));
+
+  // Group by category
+  const cats = {};
+  (md.wishes || []).forEach(w => {
+    const c = w.category || 'genel';
+    if (!cats[c]) cats[c] = [];
+    cats[c].push(w);
+  });
+  // Ensure default categories show even if empty
+  ['personal','content','work'].forEach(c => { if (!cats[c]) cats[c] = []; });
+
+  const grid = el('div', { class: 'wishes-grid' });
+  Object.keys(cats).forEach(cat => {
+    const card = el('div', { class: 'wish-cat-card' });
+    const catName = el('div', { class: 'wish-cat-name brand-edit-inline' });
+    bindEditable(catName, () => cat, v => {
+      if (!v || v === cat) return;
+      cats[cat].forEach(w => w.category = v);
+      saveState(); render();
+    });
+    card.appendChild(catName);
+
+    cats[cat].forEach(w => {
+      const itemEl = el('div', { class: 'wish-item' });
+      const txt = el('span', { class: 'wish-text' });
+      bindEditable(txt, () => w.text, v => w.text = v);
+      const del = el('span', { class: 'row-delete', text: '×', onclick: () => { md.wishes = md.wishes.filter(x => x.id !== w.id); saveState(); render(); } });
+      itemEl.appendChild(txt);
+      itemEl.appendChild(del);
+      card.appendChild(itemEl);
+    });
+
+    card.appendChild(el('div', {
+      class: 'add-button',
+      text: '+ add',
+      onclick: () => {
+        if (!md.wishes) md.wishes = [];
+        md.wishes.push({ id: uid(), category: cat, text: '' });
+        saveState(); render();
+        setTimeout(() => {
+          const last = document.querySelectorAll('.wish-text');
+          if (last.length) last[last.length-1].focus();
+        }, 0);
+      }
+    }));
+
+    grid.appendChild(card);
+  });
+
+  // Add new category button
+  const newCatBtn = el('div', { class: 'add-button', text: '+ category', style: 'margin-top:10px;', onclick: () => {
+    const name = prompt('New category name:');
+    if (name && name.trim()) {
+      if (!md.wishes) md.wishes = [];
+      md.wishes.push({ id: uid(), category: name.trim(), text: '' });
+      saveState(); render();
+    }
+  } });
+
+  wrap.appendChild(grid);
+  wrap.appendChild(newCatBtn);
+  return wrap;
+}
+
+function renderWeekView() {
+  const wrap = el('div');
+  const monday = getMonday(viewState.weekDate);
+  const sunday = new Date(monday); sunday.setDate(sunday.getDate() + 6);
+  const wd = getWeekData(monday);
+  const wn = getISOWeek(monday);
+  const today = new Date();
+  const isThisWeek = weekKey(monday) === weekKey(today);
+
+  wrap.appendChild(renderBreadcrumb());
+  wrap.appendChild(el('div', { class: 'title-row' }, [
+    el('div', { class: 'title-display smaller', text: monday.getDate() + ' - ' + sunday.getDate() + ' ' + MONTHS_TR[sunday.getMonth()] }),
+    isThisWeek ? el('div', { class: 'title-status', text: 'now' }) : null
+  ]));
+
+  const goalsT = (wd.goals || []).length, goalsD = (wd.goals || []).filter(g => g.done).length;
+  let daysFilled = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(d.getDate()+i);
+    const dd = state.days[dateKey(d)];
+    if (dd && ((dd.todos && dd.todos.length) || (dd.workout && dd.workout.trim()) || (dd.reading && (dd.reading.todayPages || dd.reading.note)))) daysFilled++;
+  }
+  wrap.appendChild(el('div', { class: 'subtitle', text: goalsD + ' / ' + goalsT + ' goals, ' + daysFilled + ' / 7 days filled' }));
+
+  const verseSpan = el('span', { class: 'verse', style: 'color:var(--accent-2);margin-bottom:22px;display:block;', data: { placeholder: '{ verse for the week }' } });
+  bindEditable(verseSpan, () => wd.verse, v => wd.verse = v);
+  wrap.appendChild(verseSpan);
+
+  // Two col: left (plan + goals), right (meals)
+  const twoCol = el('div', { class: 'two-col' });
+
+  const left = el('div');
+  left.appendChild(el('div', { class: 'section-label', text: 'Weekly plan' }));
+  const intent = el('div', { class: 'intent-card' });
+  intent.appendChild(el('div', { class: 'intent-label', text: "this week's intention" }));
+  const intentText = el('div', { class: 'intent-text', data: { placeholder: "what are you focused on this week?" } });
+  bindEditable(intentText, () => wd.intent, v => wd.intent = v, { multiline: true });
+  intent.appendChild(intentText);
+  left.appendChild(intent);
+
+  left.appendChild(el('div', { class: 'section-label', text: 'Weekly goals' }));
+  (wd.goals || []).forEach(g => {
+    left.appendChild(rowItem(
+      g,
+      () => g.text,
+      v => g.text = v,
+      () => { g.done = !g.done; saveState(); render(); },
+      () => { wd.goals = wd.goals.filter(x => x.id !== g.id); saveState(); render(); }
+    ));
+  });
+  left.appendChild(el('div', {
+    class: 'add-button',
+    text: '+ add',
+    onclick: () => {
+      if (!wd.goals) wd.goals = [];
+      wd.goals.push({ id: uid(), text: '', done: false });
+      saveState(); render();
+      setTimeout(() => {
+        const items = document.querySelectorAll('.row-text');
+        if (items.length) items[items.length-1].focus();
+      }, 0);
+    }
+  }));
+
+  const right = el('div');
+  right.appendChild(el('div', { class: 'section-label', text: 'Meal plan' }));
+  right.appendChild(renderMealTable(wd, monday));
+  right.appendChild(el('div', {
+    class: 'meal-toggle-btn',
+    text: wd.showSnack ? '+ hide snack column' : '+ show snack column',
+    onclick: () => { wd.showSnack = !wd.showSnack; saveState(); render(); }
+  }));
+
+  twoCol.appendChild(left);
+  twoCol.appendChild(right);
+  wrap.appendChild(twoCol);
+
+  // Days row
+  wrap.appendChild(el('div', { class: 'section-label', text: 'Days', style: 'margin-top:18px;' }));
+  const daysWrap = el('div', { class: 'days-row' });
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(d.getDate()+i);
+    const isToday = (dateKey(d) === dateKey(today));
+    const dd = state.days[dateKey(d)];
+    const todos = (dd && dd.todos) || [];
+    const todosT = todos.length, todosD = todos.filter(t => t.done).length;
+    const isPast = d < new Date(today.getFullYear(), today.getMonth(), today.getDate()) && !isToday;
+
+    let status;
+    if (isToday) status = 'today';
+    else if (todosT > 0 && todosD === todosT) status = 'done';
+    else if (todosT > 0) status = todosD + ' / ' + todosT;
+    else if (dd && (dd.workout || (dd.reading && dd.reading.todayPages))) status = 'filled';
+    else status = isPast ? 'empty' : '—';
+
+    const card = el('div', {
+      class: 'day-card' + (isToday ? ' today' : ''),
+      onclick: () => { viewState.dayDate = new Date(d); viewState.level = 'day'; render(); }
+    });
+    card.appendChild(el('div', { class: 'day-name' + (isToday ? ' today' : ''), text: DAYS_TR_SHORT[i] }));
+    card.appendChild(el('div', { class: 'day-num', text: d.getDate() }));
+    const statusCls = 'day-status' + (status === 'done' ? ' done' : '') + (isToday ? ' today' : '');
+    card.appendChild(el('div', { class: statusCls, text: status }));
+    daysWrap.appendChild(card);
+  }
+  wrap.appendChild(daysWrap);
+
+  // Minnet
+  wrap.appendChild(renderGratitudeSection(wd));
+
+  return wrap;
+}
+
+function renderMealTable(wd, monday) {
+  const wrap = el('div', { class: 'meal-table-wrap' });
+  const table = el('div', { class: 'meal-table' });
+  const today = new Date();
+  const todayKey = dateKey(today);
+
+  const rowCls = 'meal-row' + (wd.showSnack ? ' with-snack' : '');
+
+  const header = el('div', { class: rowCls + ' header' });
+  header.appendChild(el('div', {}));
+  header.appendChild(el('div', { text: 'breakfast' }));
+  header.appendChild(el('div', { text: 'lunch' }));
+  header.appendChild(el('div', { text: 'dinner' }));
+  if (wd.showSnack) header.appendChild(el('div', { class: 'snack-col', text: 'snack' }));
+  table.appendChild(header);
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(d.getDate()+i);
+    const dk = dateKey(d);
+    const isToday = dk === todayKey;
+    if (!wd.meals[dk]) wd.meals[dk] = { sabah: '', ogle: '', aksam: '', snack: '' };
+    const m = wd.meals[dk];
+
+    const row = el('div', { class: rowCls });
+    row.appendChild(el('div', { class: 'meal-cell day-header' + (isToday ? ' today' : ''), text: DAYS_TR_SHORT[i] }));
+    ['sabah','ogle','aksam'].forEach(slot => {
+      const cell = el('div', { class: 'meal-cell', data: { placeholder: '...' } });
+      bindEditable(cell, () => m[slot], v => m[slot] = v);
+      row.appendChild(cell);
+    });
+    if (wd.showSnack) {
+      const cell = el('div', { class: 'meal-cell', data: { placeholder: '...' }, style: 'color:var(--ink-secondary);' });
+      bindEditable(cell, () => m.snack, v => m.snack = v);
+      row.appendChild(cell);
+    }
+    table.appendChild(row);
+  }
+  wrap.appendChild(table);
+  return wrap;
+}
+
+function rowItem(item, getText, setText, toggle, deleteFn) {
+  const row = el('div', { class: 'row-item' + (item.done ? ' done' : '') });
+  const cb = el('div', { class: 'checkbox' + (item.done ? ' checked' : ''), onclick: toggle });
+  const txt = el('span', { class: 'row-text' });
+  bindEditable(txt, getText, setText);
+  const del = el('span', { class: 'row-delete', text: '×', onclick: deleteFn });
+  row.appendChild(cb); row.appendChild(txt); row.appendChild(del);
+  return row;
+}
+
+function renderDayView() {
+  const wrap = el('div');
+  const d = new Date(viewState.dayDate);
+  const dd = getDayData(d);
+  const today = new Date();
+  const isToday = dateKey(d) === dateKey(today);
+
+  wrap.appendChild(renderBreadcrumb());
+  wrap.appendChild(el('div', { class: 'title-row' }, [
+    el('div', { class: 'title-display smaller', text: d.getDate() + ' ' + MONTHS_TR[d.getMonth()] }),
+    el('div', { class: 'title-status', text: isToday ? 'today' : DAYS_TR_LONG[(d.getDay()+6)%7] })
+  ]));
+
+  const todosT = (dd.todos || []).length;
+  const todosD = (dd.todos || []).filter(t => t.done).length;
+  const todayBook = getActiveBook();
+  const todayPages = (dd.reading && dd.reading.todayPages) ? dd.reading.todayPages : 0;
+  wrap.appendChild(el('div', { class: 'subtitle', text: (todosT - todosD) + ' to-do, ' + (dd.workout && dd.workout.trim() ? '1 workout' : '0 workouts') + ', ' + (todayPages || 0) + ' pages' }));
+
+  const verseSpan = el('span', { class: 'verse', style: 'color:var(--accent-2);margin-bottom:22px;display:block;', data: { placeholder: '{ verse for the day }' } });
+  bindEditable(verseSpan, () => dd.verse, v => dd.verse = v);
+  wrap.appendChild(verseSpan);
+
+  const cols = el('div', { class: 'three-col' });
+
+  // Todos
+  const todoCol = el('div');
+  todoCol.appendChild(el('div', { class: 'section-label', text: 'To-dos' }));
+  (dd.todos || []).forEach(t => {
+    todoCol.appendChild(rowItem(
+      t,
+      () => t.text,
+      v => t.text = v,
+      () => { t.done = !t.done; saveState(); render(); },
+      () => { dd.todos = dd.todos.filter(x => x.id !== t.id); saveState(); render(); }
+    ));
+  });
+  todoCol.appendChild(el('div', {
+    class: 'add-button',
+    text: '+ add',
+    onclick: () => {
+      if (!dd.todos) dd.todos = [];
+      dd.todos.push({ id: uid(), text: '', done: false });
+      saveState(); render();
+      setTimeout(() => {
+        const items = document.querySelectorAll('.row-text');
+        if (items.length) items[items.length-1].focus();
+      }, 0);
+    }
+  }));
+
+  // Workout
+  const workoutCol = el('div');
+  workoutCol.appendChild(el('div', { class: 'section-label', text: 'Workout' }));
+  const woCard = el('div', { class: 'workout-card' });
+  woCard.appendChild(el('div', { class: 'workout-hint', text: 'write what you did today' }));
+  const woText = el('div', { class: 'workout-text', data: { placeholder: 'what did you do today?' } });
+  bindEditable(woText, () => dd.workout, v => dd.workout = v, { multiline: true });
+  woCard.appendChild(woText);
+  workoutCol.appendChild(woCard);
+
+  // Reading
+  const readCol = el('div');
+  readCol.appendChild(el('div', { class: 'section-label', text: 'Reading' }));
+  readCol.appendChild(renderReadingCard(dd));
+
+  cols.appendChild(todoCol);
+  cols.appendChild(workoutCol);
+  cols.appendChild(readCol);
+  wrap.appendChild(cols);
+
+  // Minnet
+  wrap.appendChild(renderGratitudeSection(dd));
+
+  return wrap;
+}
+
+function renderReadingCard(dd) {
+  const card = el('div', { class: 'reading-card' });
+  const book = getActiveBook();
+
+  // Book selector / display
+  if (!book) {
+    // No book yet, prompt to add one
+    card.appendChild(el('div', { class: 'empty-state', text: 'no active book yet' }));
+    card.appendChild(el('div', { class: 'add-button', text: '+ add book', onclick: () => {
+      const newBook = { id: uid(), title: '', author: '', currentPage: 0, totalPages: 0, active: true };
+      state.books.push(newBook);
+      if (!dd.reading) dd.reading = { bookId: null, todayPages: '', note: '' };
+      dd.reading.bookId = newBook.id;
+      saveState(); render();
+      setTimeout(() => { const t = document.querySelector('.book-title'); if (t) t.focus(); }, 0);
+    } }));
+    return card;
+  }
+
+  if (!dd.reading) dd.reading = { bookId: book.id, todayPages: '', note: '' };
+  if (!dd.reading.bookId) dd.reading.bookId = book.id;
+
+  const titleEl = el('div', { class: 'book-title', data: { placeholder: 'book title' } });
+  bindEditable(titleEl, () => book.title, v => book.title = v);
+  card.appendChild(titleEl);
+
+  const authorEl = el('div', { class: 'book-author', data: { placeholder: 'author' } });
+  bindEditable(authorEl, () => book.author, v => book.author = v);
+  card.appendChild(authorEl);
+
+  const pct = book.totalPages ? Math.round((book.currentPage / book.totalPages) * 100) : 0;
+  const progress = el('div', { class: 'book-progress' }, [el('div', { class: 'book-progress-fill', style: 'width:' + pct + '%' })]);
+  card.appendChild(progress);
+
+  const pagesRow = el('div', { class: 'book-pages' });
+  const cur = el('input', { class: 'page-input', type: 'number', min: '0', value: book.currentPage || 0, oninput: e => { book.currentPage = parseInt(e.target.value, 10) || 0; saveState(); const p = document.querySelector('.book-progress-fill'); const t = document.querySelectorAll('.book-pages span'); if (p && book.totalPages) p.style.width = Math.round((book.currentPage/book.totalPages)*100) + '%'; if (t.length) t[t.length-1].textContent = (book.totalPages ? Math.round((book.currentPage/book.totalPages)*100) : 0) + '%'; } });
+  const total = el('input', { class: 'page-input', type: 'number', min: '0', value: book.totalPages || 0, oninput: e => { book.totalPages = parseInt(e.target.value, 10) || 0; saveState(); const p = document.querySelector('.book-progress-fill'); if (p) p.style.width = (book.totalPages ? Math.round((book.currentPage/book.totalPages)*100) : 0) + '%'; } });
+
+  const pagesContent = el('span', {}, [cur, document.createTextNode(' / '), total, document.createTextNode(' pages')]);
+  pagesRow.appendChild(pagesContent);
+  pagesRow.appendChild(el('span', { text: pct + '%' }));
+  card.appendChild(pagesRow);
+
+  const today = el('div', { class: 'book-today' });
+  const todayPagesRow = el('div', { class: 'book-today-pages' });
+  const todayPagesInput = el('input', { class: 'page-input', type: 'number', min: '0', value: dd.reading.todayPages || 0, style: 'width:42px;', oninput: e => { dd.reading.todayPages = parseInt(e.target.value, 10) || 0; saveState(); } });
+  todayPagesRow.appendChild(document.createTextNode('today, '));
+  todayPagesRow.appendChild(todayPagesInput);
+  todayPagesRow.appendChild(document.createTextNode(' pages'));
+  today.appendChild(todayPagesRow);
+
+  const noteEl = el('div', { class: 'book-today-note', data: { placeholder: "note about today's reading..." } });
+  bindEditable(noteEl, () => dd.reading.note, v => dd.reading.note = v, { multiline: true });
+  today.appendChild(noteEl);
+  card.appendChild(today);
+
+  // Book switcher
+  if (state.books.length > 1) {
+    const sel = el('select', { class: 'status-select', style: 'margin-top:10px;', onchange: e => {
+      state.books.forEach(b => b.active = (b.id === e.target.value));
+      saveState(); render();
+    } });
+    state.books.forEach(b => {
+      const opt = el('option', { value: b.id, text: b.title || 'book' });
+      if (b.active) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    card.appendChild(sel);
+  }
+
+  card.appendChild(el('div', { class: 'add-button', text: '+ book', style: 'margin-top:8px;', onclick: () => {
+    state.books.forEach(b => b.active = false);
+    const newBook = { id: uid(), title: '', author: '', currentPage: 0, totalPages: 0, active: true };
+    state.books.push(newBook);
+    saveState(); render();
+    setTimeout(() => { const t = document.querySelector('.book-title'); if (t) t.focus(); }, 0);
+  } }));
+
+  return card;
+}
+
+function exportData() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ebbs-world-' + dateKey(new Date()) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (confirm('Your current data will be replaced. Continue?')) {
+          const fresh = defaultState();
+          state = Object.assign({}, fresh, data, {
+            meta: Object.assign({}, fresh.meta, data.meta || {}),
+            months: data.months || {},
+            weeks: data.weeks || {},
+            days: data.days || {},
+            books: data.books || []
+          });
+          saveState();
+          applyTheme();
+          render();
+        }
+      } catch (err) {
+        alert('Could not read file. JSON format may be broken.');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function resetData() {
+  if (confirm('All data will be deleted and the app will reset. This cannot be undone. Are you sure?')) {
+    state = defaultState();
+    saveState();
+    applyTheme();
+    render();
+  }
+}
+
+function renderFooter() {
+  return el('div', { class: 'footer-actions' }, [
+    el('span', { class: 'footer-link', text: 'backup', onclick: exportData }),
+    el('span', { class: 'footer-sep', text: '/' }),
+    el('span', { class: 'footer-link', text: 'restore', onclick: importData }),
+    el('span', { class: 'footer-sep', text: '/' }),
+    el('span', { class: 'footer-link danger', text: 'reset', onclick: resetData }),
+    el('span', { class: 'footer-info', text: 'data saved in your browser' })
+  ]);
+}
+
+function render() {
+  applyTheme();
+  const c = document.getElementById('content');
+  c.innerHTML = '';
+  c.appendChild(renderHeaderBand());
+  c.appendChild(renderGlobalVerse());
+
+  if (viewState.level === 'year') c.appendChild(renderYearView());
+  else if (viewState.level === 'month') {
+    const detail = el('div', { class: 'detail-section', style: 'border-top:none;padding-top:0;' });
+    detail.appendChild(renderMonthView());
+    c.appendChild(detail);
+  }
+  else if (viewState.level === 'week') {
+    const detail = el('div', { class: 'detail-section', style: 'border-top:none;padding-top:0;' });
+    detail.appendChild(renderWeekView());
+    c.appendChild(detail);
+  }
+  else if (viewState.level === 'day') {
+    const detail = el('div', { class: 'detail-section', style: 'border-top:none;padding-top:0;' });
+    detail.appendChild(renderDayView());
+    c.appendChild(detail);
+  }
+
+  c.appendChild(renderFooter());
+}
+
+function openCustomThemeModal(existingName) {
+  const host = document.getElementById('modal-host');
+  host.innerHTML = '';
+
+  let initial = { paper: '#F0E5CD', accent1: '#6B8A4F', accent2: '#B07570', name: '' };
+  if (existingName) {
+    const t = state.meta.customThemes.find(x => x.name === existingName);
+    if (t) initial = { paper: t.paper, accent1: t.accent1, accent2: t.accent2, name: t.name };
+  }
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+
+  const title = document.createElement('div');
+  title.className = 'modal-title';
+  title.textContent = existingName ? 'Edit theme' : 'Create custom theme';
+  modal.appendChild(title);
+
+  const sub = document.createElement('div');
+  sub.className = 'modal-sub';
+  sub.textContent = 'Pick three colors. Page color, first accent, second accent.';
+  modal.appendChild(sub);
+
+  // İsim
+  const nameRow = document.createElement('div');
+  nameRow.className = 'color-row';
+  const nameLabel = document.createElement('label');
+  nameLabel.textContent = 'Theme name';
+  nameRow.appendChild(nameLabel);
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.value = initial.name;
+  nameInput.placeholder = 'e.g., Plum Twilight';
+  nameRow.appendChild(nameInput);
+  modal.appendChild(nameRow);
+
+  // Renk girişleri (DOM referansları korunuyor)
+  function makeColorInputs(initialVal) {
+    const colorInput = document.createElement('input');
+    colorInput.type = 'color';
+    colorInput.value = initialVal;
+    const textInput = document.createElement('input');
+    textInput.type = 'text';
+    textInput.value = initialVal;
+    textInput.placeholder = '#000000';
+    textInput.maxLength = 7;
+    textInput.spellcheck = false;
+    textInput.autocapitalize = 'none';
+    textInput.autocomplete = 'off';
+    return { colorInput, textInput };
+  }
+
+  function normalizeHex(v) {
+    v = (v || '').trim();
+    if (!v) return null;
+    if (/^[0-9A-Fa-f]{6}$/.test(v)) v = '#' + v;
+    if (/^#[0-9A-Fa-f]{3}$/.test(v)) v = '#' + v.slice(1).split('').map(c => c + c).join('');
+    return /^#[0-9A-Fa-f]{6}$/.test(v) ? v.toLowerCase() : null;
+  }
+
+  function syncPair(colorInput, textInput) {
+    colorInput.addEventListener('input', () => {
+      textInput.value = colorInput.value;
+      updatePreview();
+    });
+    textInput.addEventListener('input', () => {
+      const norm = normalizeHex(textInput.value);
+      if (norm) {
+        colorInput.value = norm;
+        updatePreview();
+      }
+    });
+    textInput.addEventListener('blur', () => {
+      const norm = normalizeHex(textInput.value);
+      if (norm) {
+        textInput.value = norm;
+      } else {
+        textInput.value = colorInput.value;
+      }
+    });
+  }
+
+  const paper = makeColorInputs(initial.paper);
+  const a1 = makeColorInputs(initial.accent1);
+  const a2 = makeColorInputs(initial.accent2);
+
+  function makeRow(label, pair) {
+    const row = document.createElement('div');
+    row.className = 'color-row';
+    const lbl = document.createElement('label');
+    lbl.textContent = label;
+    row.appendChild(lbl);
+    row.appendChild(pair.colorInput);
+    row.appendChild(pair.textInput);
+    return row;
+  }
+
+  modal.appendChild(makeRow('Page color', paper));
+  modal.appendChild(makeRow('Accent 1', a1));
+  modal.appendChild(makeRow('Accent 2', a2));
+
+  syncPair(paper.colorInput, paper.textInput);
+  syncPair(a1.colorInput, a1.textInput);
+  syncPair(a2.colorInput, a2.textInput);
+
+  // Önizleme
+  const preview = document.createElement('div');
+  preview.className = 'modal-preview';
+  modal.appendChild(preview);
+
+  function updatePreview() {
+    preview.innerHTML = '';
+    preview.style.backgroundColor = paper.colorInput.value;
+    const dot1 = document.createElement('div');
+    dot1.className = 'modal-preview-dot';
+    dot1.style.background = a1.colorInput.value;
+    const dot2 = document.createElement('div');
+    dot2.className = 'modal-preview-dot';
+    dot2.style.background = a2.colorInput.value;
+    const txt = document.createElement('div');
+    txt.className = 'modal-preview-text';
+    txt.style.color = a2.colorInput.value;
+    txt.textContent = 'creating moments of joy';
+    preview.appendChild(dot1);
+    preview.appendChild(dot2);
+    preview.appendChild(txt);
+  }
+  updatePreview();
+
+  // Aksiyonlar
+  const actions = document.createElement('div');
+  actions.className = 'modal-actions';
+
+  if (existingName) {
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn danger';
+    delBtn.textContent = 'Delete';
+    delBtn.onclick = () => {
+      state.meta.customThemes = state.meta.customThemes.filter(t => t.name !== existingName);
+      if (state.meta.activeTheme === existingName) state.meta.activeTheme = 'Sage Mead';
+      saveState();
+      host.innerHTML = '';
+      applyTheme();
+      render();
+    };
+    actions.appendChild(delBtn);
+  }
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn';
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.onclick = () => { host.innerHTML = ''; };
+  actions.appendChild(cancelBtn);
+
+  const submitBtn = document.createElement('button');
+  submitBtn.className = 'btn primary';
+  submitBtn.textContent = existingName ? 'Save' : 'Create';
+  submitBtn.onclick = () => {
+    try {
+      const enteredName = (nameInput.value || '').trim();
+      const finalName = enteredName || ('Custom ' + ((state.meta.customThemes || []).length + 1));
+      const finalPaper = normalizeHex(paper.textInput.value) || paper.colorInput.value;
+      const finalA1 = normalizeHex(a1.textInput.value) || a1.colorInput.value;
+      const finalA2 = normalizeHex(a2.textInput.value) || a2.colorInput.value;
+
+      // Defansif, dizinin varlığını garanti et
+      if (!Array.isArray(state.meta.customThemes)) state.meta.customThemes = [];
+
+      // İsim çakışması kontrolü (yeni oluşturmada)
+      if (!existingName) {
+        const allNames = [...PRESET_THEMES.map(t => t.name), ...state.meta.customThemes.map(t => t.name)];
+        if (allNames.indexOf(finalName) !== -1) {
+          showToast('a theme with this name already exists', 'error');
+          nameInput.focus();
+          return;
+        }
+      }
+
+      if (existingName) {
+        const t = state.meta.customThemes.find(x => x.name === existingName);
+        if (t) {
+          t.name = finalName;
+          t.paper = finalPaper;
+          t.accent1 = finalA1;
+          t.accent2 = finalA2;
+        }
+        if (state.meta.activeTheme === existingName) state.meta.activeTheme = finalName;
+      } else {
+        state.meta.customThemes.push({
+          name: finalName,
+          paper: finalPaper,
+          accent1: finalA1,
+          accent2: finalA2
+        });
+        state.meta.activeTheme = finalName;
+      }
+
+      const ok = saveState();
+      host.innerHTML = '';
+      applyTheme();
+      render();
+      if (ok) showToast(existingName ? 'theme updated, ' + finalName : 'theme saved, ' + finalName);
+    } catch (err) {
+      console.error(err);
+      showToast('error, ' + err.message, 'error');
+    }
+  };
+  actions.appendChild(submitBtn);
+  modal.appendChild(actions);
+
+  backdrop.appendChild(modal);
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) host.innerHTML = ''; });
+  host.appendChild(backdrop);
+
+  setTimeout(() => nameInput.focus(), 50);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const host = document.getElementById('modal-host');
+    if (host.firstChild) { host.innerHTML = ''; return; }
+
+    // Eğer bir alan düzenleniyorsa, esc orayı kapatır, navigation tetiklenmez
+    const active = document.activeElement;
+    if (active && (active.contentEditable === 'true' || active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
+      return;
+    }
+
+    // Bir seviye geri git
+    if (viewState.level === 'day') { viewState.level = 'week'; render(); }
+    else if (viewState.level === 'week') { viewState.level = 'month'; render(); }
+    else if (viewState.level === 'month') { viewState.level = 'year'; render(); }
+  }
+});
+
+applyTheme();
+applyFontSize();
+render();
+
+</script>
+</body>
+</html>
