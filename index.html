@@ -737,9 +737,6 @@ body.font-large .day-name { font-size: 12px; }
   grid-template-columns: 36px 1fr 1fr 1fr;
   border-bottom: 0.5px solid rgba(46,37,28,0.1);
 }
-.meal-row.with-snack {
-  grid-template-columns: 36px 1fr 1fr 1fr 0.85fr;
-}
 .meal-row:last-child { border-bottom: none; }
 
 .meal-row.header {
@@ -748,7 +745,6 @@ body.font-large .day-name { font-size: 12px; }
   color: var(--ink-faint);
 }
 .meal-row.header > div { padding: 7px 10px; }
-.meal-row.header .snack-col { color: var(--accent-2); }
 
 .meal-cell {
   padding: 7px 10px;
@@ -774,15 +770,6 @@ body.font-large .day-name { font-size: 12px; }
   pointer-events: none;
   font-style: italic;
 }
-
-.meal-toggle-btn {
-  font-size: 11px;
-  color: var(--accent-2);
-  margin-top: 8px;
-  cursor: pointer;
-  display: inline-block;
-}
-.meal-toggle-btn:hover { background: rgba(176, 117, 112, 0.1); border-radius: 3px; padding: 2px 5px; margin-left: -5px; }
 
 .days-row {
   display: grid;
@@ -1208,7 +1195,6 @@ body.font-large .day-name { font-size: 12px; }
   }
   .meal-table { overflow: visible; }
   .meal-row { min-width: 480px; }
-  .meal-row.with-snack { min-width: 560px; }
 
   /* Dokunmatik için büyütülmüş kutucuklar */
   .checkbox { width: 18px; height: 18px; }
@@ -1400,6 +1386,7 @@ function loadState() {
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    pushToCloudDebounced();
     return true;
   } catch (e) {
     console.error('Save failed:', e);
@@ -1426,7 +1413,6 @@ function getWeekData(d) {
   if (typeof wd.intent !== 'string') wd.intent = '';
   if (!Array.isArray(wd.goals)) wd.goals = [];
   if (typeof wd.meals !== 'object' || !wd.meals) wd.meals = {};
-  if (typeof wd.showSnack !== 'boolean') wd.showSnack = true;
   if (typeof wd.verse !== 'string') wd.verse = '';
   if (!Array.isArray(wd.gratitude)) wd.gratitude = [];
   return wd;
@@ -2226,11 +2212,6 @@ function renderWeekView() {
   const right = el('div');
   right.appendChild(el('div', { class: 'section-label', text: 'Meal plan' }));
   right.appendChild(renderMealTable(wd, monday));
-  right.appendChild(el('div', {
-    class: 'meal-toggle-btn',
-    text: wd.showSnack ? '+ hide snack column' : '+ show snack column',
-    onclick: () => { wd.showSnack = !wd.showSnack; saveState(); render(); }
-  }));
 
   twoCol.appendChild(left);
   twoCol.appendChild(right);
@@ -2278,35 +2259,27 @@ function renderMealTable(wd, monday) {
   const today = new Date();
   const todayKey = dateKey(today);
 
-  const rowCls = 'meal-row' + (wd.showSnack ? ' with-snack' : '');
-
-  const header = el('div', { class: rowCls + ' header' });
+  const header = el('div', { class: 'meal-row header' });
   header.appendChild(el('div', {}));
   header.appendChild(el('div', { text: 'breakfast' }));
   header.appendChild(el('div', { text: 'lunch' }));
   header.appendChild(el('div', { text: 'dinner' }));
-  if (wd.showSnack) header.appendChild(el('div', { class: 'snack-col', text: 'snack' }));
   table.appendChild(header);
 
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday); d.setDate(d.getDate()+i);
     const dk = dateKey(d);
     const isToday = dk === todayKey;
-    if (!wd.meals[dk]) wd.meals[dk] = { sabah: '', ogle: '', aksam: '', snack: '' };
+    if (!wd.meals[dk]) wd.meals[dk] = { sabah: '', ogle: '', aksam: '' };
     const m = wd.meals[dk];
 
-    const row = el('div', { class: rowCls });
+    const row = el('div', { class: 'meal-row' });
     row.appendChild(el('div', { class: 'meal-cell day-header' + (isToday ? ' today' : ''), text: DAYS_TR_SHORT[i] }));
     ['sabah','ogle','aksam'].forEach(slot => {
       const cell = el('div', { class: 'meal-cell', data: { placeholder: '...' } });
       bindEditable(cell, () => m[slot], v => m[slot] = v);
       row.appendChild(cell);
     });
-    if (wd.showSnack) {
-      const cell = el('div', { class: 'meal-cell', data: { placeholder: '...' }, style: 'color:var(--ink-secondary);' });
-      bindEditable(cell, () => m.snack, v => m.snack = v);
-      row.appendChild(cell);
-    }
     table.appendChild(row);
   }
   wrap.appendChild(table);
@@ -2542,8 +2515,10 @@ function renderFooter() {
     el('span', { class: 'footer-sep', text: '/' }),
     el('span', { class: 'footer-link', text: 'restore', onclick: importData }),
     el('span', { class: 'footer-sep', text: '/' }),
+    el('span', { class: 'footer-link', text: 'cloud sync', onclick: openCloudSyncModal }),
+    el('span', { class: 'footer-sep', text: '/' }),
     el('span', { class: 'footer-link danger', text: 'reset', onclick: resetData }),
-    el('span', { class: 'footer-info', text: 'data saved in your browser' })
+    el('span', { id: 'cloud-status-text', class: 'footer-info', text: cloudStatusFooterText() })
   ]);
 }
 
@@ -2812,9 +2787,319 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// ============================================================
+// Cloud sync (Supabase)
+// ============================================================
+const SUPABASE_URL = 'https://jmzutaadfonaewepexfq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Lz8JzJSn2WHV6Rr4NOPl4Q_VspJtlFz';
+const CLOUD_SETTINGS_KEY = 'ebbsWorld_cloud';
+const CLIENT_ID = (() => {
+  const k = 'ebbsWorld_clientId';
+  let id = localStorage.getItem(k);
+  if (!id) {
+    id = 'c_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    localStorage.setItem(k, id);
+  }
+  return id;
+})();
+
+let cloudClient = null;
+let cloudVaultKey = null;
+let cloudChannel = null;
+let cloudPushTimeout = null;
+let cloudStatus = 'idle';
+let cloudStatusMsg = '';
+let cloudIsApplyingRemote = false;
+
+function getCloudSettings() {
+  let stored = {};
+  try { stored = JSON.parse(localStorage.getItem(CLOUD_SETTINGS_KEY) || '{}'); }
+  catch { stored = {}; }
+  return {
+    url: SUPABASE_URL,
+    anonKey: SUPABASE_KEY,
+    vaultKey: stored.vaultKey || ''
+  };
+}
+function setCloudSettings(s) {
+  localStorage.setItem(CLOUD_SETTINGS_KEY, JSON.stringify({ vaultKey: s.vaultKey || '' }));
+}
+function clearCloudSettings() { localStorage.removeItem(CLOUD_SETTINGS_KEY); }
+
+function cloudStatusFooterText() {
+  const s = getCloudSettings();
+  if (!s.vaultKey) return 'data saved in your browser';
+  if (cloudStatus === 'connecting') return 'cloud, connecting';
+  if (cloudStatus === 'syncing') return 'cloud, syncing';
+  if (cloudStatus === 'connected') return 'cloud, synced';
+  if (cloudStatus === 'error') return 'cloud, error';
+  return 'cloud, idle';
+}
+
+function setCloudStatus(s, msg) {
+  cloudStatus = s;
+  cloudStatusMsg = msg || '';
+  const elS = document.getElementById('cloud-status-text');
+  if (elS) elS.textContent = cloudStatusFooterText();
+}
+
+async function loadSupabaseLib() {
+  if (window.supabase && window.supabase.createClient) return;
+  await new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('Could not load Supabase library, check internet'));
+    document.head.appendChild(s);
+  });
+  if (!window.supabase || !window.supabase.createClient) {
+    throw new Error('Supabase library loaded but not usable');
+  }
+}
+
+async function initCloudSync() {
+  const s = getCloudSettings();
+  if (!s.url || !s.anonKey || !s.vaultKey) { setCloudStatus('idle'); return; }
+  try {
+    setCloudStatus('connecting');
+    await loadSupabaseLib();
+    cloudClient = window.supabase.createClient(s.url, s.anonKey);
+    cloudVaultKey = s.vaultKey;
+    await pullFromCloud();
+    subscribeToCloudChanges();
+    setCloudStatus('connected');
+  } catch (err) {
+    console.error('Cloud sync init failed:', err);
+    setCloudStatus('error', err.message || String(err));
+  }
+}
+
+async function pullFromCloud() {
+  if (!cloudClient || !cloudVaultKey) return;
+  const { data, error } = await cloudClient
+    .from('vault')
+    .select('data, updated_at, last_client')
+    .eq('vault_key', cloudVaultKey)
+    .maybeSingle();
+  if (error) throw error;
+  if (data && data.data) {
+    cloudIsApplyingRemote = true;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data.data));
+      state = loadState();
+      render();
+    } finally { cloudIsApplyingRemote = false; }
+  } else {
+    await pushToCloudNow();
+  }
+}
+
+function pushToCloudDebounced() {
+  if (!cloudClient || !cloudVaultKey) return;
+  if (cloudIsApplyingRemote) return;
+  clearTimeout(cloudPushTimeout);
+  cloudPushTimeout = setTimeout(pushToCloudNow, 800);
+}
+
+async function pushToCloudNow() {
+  if (!cloudClient || !cloudVaultKey) return;
+  try {
+    setCloudStatus('syncing');
+    const { error } = await cloudClient
+      .from('vault')
+      .upsert({
+        vault_key: cloudVaultKey,
+        data: state,
+        last_client: CLIENT_ID,
+        updated_at: new Date().toISOString()
+      });
+    if (error) throw error;
+    setCloudStatus('connected');
+  } catch (err) {
+    console.error('Cloud push failed:', err);
+    setCloudStatus('error', err.message || String(err));
+  }
+}
+
+function subscribeToCloudChanges() {
+  if (!cloudClient || !cloudVaultKey) return;
+  if (cloudChannel) { try { cloudChannel.unsubscribe(); } catch {} }
+  cloudChannel = cloudClient
+    .channel('vault-' + cloudVaultKey)
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'vault',
+      filter: 'vault_key=eq.' + cloudVaultKey
+    }, payload => {
+      const newRow = payload.new;
+      if (!newRow || !newRow.data) return;
+      if (newRow.last_client === CLIENT_ID) return;
+      cloudIsApplyingRemote = true;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newRow.data));
+        state = loadState();
+        render();
+        showToast('updated from another device');
+      } finally { cloudIsApplyingRemote = false; }
+    })
+    .subscribe();
+}
+
+function disconnectCloud() {
+  if (cloudChannel) { try { cloudChannel.unsubscribe(); } catch {} cloudChannel = null; }
+  cloudClient = null;
+  cloudVaultKey = null;
+  clearCloudSettings();
+  setCloudStatus('idle');
+  const elS = document.getElementById('cloud-status-text');
+  if (elS) elS.textContent = 'data saved in your browser';
+}
+
+function openCloudSyncModal() {
+  const host = document.getElementById('modal-host');
+  host.innerHTML = '';
+  const settings = getCloudSettings();
+  const isConfigured = !!settings.vaultKey;
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.style.maxWidth = '460px';
+
+  const titleEl = document.createElement('div');
+  titleEl.className = 'modal-title';
+  titleEl.textContent = 'Cloud sync';
+  modal.appendChild(titleEl);
+
+  const subEl = document.createElement('div');
+  subEl.className = 'modal-sub';
+  subEl.textContent = isConfigured
+    ? 'Connected. Use the same vault key on every device to share data.'
+    : 'Set a vault key to sync across devices. Use the same key everywhere.';
+  modal.appendChild(subEl);
+
+  function makeInputRow(label, value, placeholder) {
+    const row = document.createElement('div');
+    row.className = 'color-row';
+    const lbl = document.createElement('label');
+    lbl.textContent = label;
+    row.appendChild(lbl);
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.value = value || '';
+    if (placeholder) inp.placeholder = placeholder;
+    inp.spellcheck = false;
+    inp.autocapitalize = 'none';
+    inp.autocomplete = 'off';
+    inp.style.flex = '1';
+    inp.style.minWidth = '0';
+    row.appendChild(inp);
+    return { row, inp };
+  }
+
+  const vaultR = makeInputRow('Vault key', settings.vaultKey, 'paste or generate');
+  modal.appendChild(vaultR.row);
+
+  const genWrap = document.createElement('div');
+  genWrap.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin:-6px 2px 14px;font-size:12px;font-family:Lora,serif;font-style:italic;';
+  const genLink = document.createElement('span');
+  genLink.style.cssText = 'cursor:pointer;color:var(--accent-2);';
+  genLink.textContent = 'generate new vault key';
+  genLink.onclick = () => {
+    vaultR.inp.value = 'v_' + Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
+  };
+  genWrap.appendChild(genLink);
+  if (isConfigured && settings.vaultKey) {
+    const copyLink = document.createElement('span');
+    copyLink.style.cssText = 'cursor:pointer;color:var(--accent-2);';
+    copyLink.textContent = 'copy current key';
+    copyLink.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(settings.vaultKey);
+        showToast('vault key copied');
+      } catch {
+        showToast('copy failed, select manually', 'error');
+      }
+    };
+    genWrap.appendChild(copyLink);
+  }
+  modal.appendChild(genWrap);
+
+  if (isConfigured) {
+    const statusBox = document.createElement('div');
+    statusBox.style.cssText = 'padding:10px 12px;background:rgba(107,138,79,0.06);border-left:3px solid var(--accent-1);font-size:13px;font-family:Lora,serif;font-style:italic;color:var(--ink-soft);margin:0 0 14px;';
+    let label = 'idle';
+    if (cloudStatus === 'connected') label = 'connected and synced';
+    else if (cloudStatus === 'connecting') label = 'connecting';
+    else if (cloudStatus === 'syncing') label = 'syncing';
+    else if (cloudStatus === 'error') label = 'error, ' + (cloudStatusMsg || 'unknown');
+    statusBox.textContent = 'Status, ' + label;
+    modal.appendChild(statusBox);
+  }
+
+  const help = document.createElement('div');
+  help.style.cssText = 'font-size:12px;font-family:Lora,serif;color:var(--ink-soft);line-height:1.55;margin-bottom:16px;padding:10px 12px;background:rgba(176,117,112,0.05);border-radius:4px;';
+  help.textContent = 'First device, generate a new vault key. Other devices, paste the same key. Anyone with this key can read your data, so keep it private.';
+  modal.appendChild(help);
+
+  const actions = document.createElement('div');
+  actions.className = 'modal-actions';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn';
+  cancelBtn.textContent = 'cancel';
+  cancelBtn.onclick = () => { host.innerHTML = ''; };
+  actions.appendChild(cancelBtn);
+
+  if (isConfigured) {
+    const disconnectBtn = document.createElement('button');
+    disconnectBtn.className = 'btn danger';
+    disconnectBtn.textContent = 'disconnect';
+    disconnectBtn.onclick = () => {
+      if (confirm('Stop cloud sync? Local data is kept on this device.')) {
+        disconnectCloud();
+        host.innerHTML = '';
+        showToast('cloud sync disconnected');
+      }
+    };
+    actions.appendChild(disconnectBtn);
+  }
+
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'btn primary';
+  saveBtn.textContent = isConfigured ? 'update and reconnect' : 'save and connect';
+  saveBtn.onclick = async () => {
+    const vaultKey = vaultR.inp.value.trim();
+    if (!vaultKey) { showToast('vault key required', 'error'); return; }
+    if (vaultKey.length < 6) { showToast('vault key too short, use 6+ characters', 'error'); return; }
+    setCloudSettings({ vaultKey });
+    host.innerHTML = '';
+    showToast('connecting...');
+    if (cloudChannel) { try { cloudChannel.unsubscribe(); } catch {} cloudChannel = null; }
+    cloudClient = null;
+    cloudVaultKey = null;
+    try {
+      await initCloudSync();
+      if (cloudStatus === 'connected') showToast('cloud sync connected');
+      else if (cloudStatus === 'error') showToast('error, ' + cloudStatusMsg, 'error');
+    } catch (err) {
+      showToast('connection error, ' + (err.message || err), 'error');
+    }
+  };
+  actions.appendChild(saveBtn);
+  modal.appendChild(actions);
+
+  backdrop.appendChild(modal);
+  backdrop.onclick = e => { if (e.target === backdrop) host.innerHTML = ''; };
+  host.appendChild(backdrop);
+}
+
 applyTheme();
 applyFontSize();
 render();
+initCloudSync();
 
 </script>
 </body>
