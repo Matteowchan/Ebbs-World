@@ -34,19 +34,21 @@ input, textarea, select { font: inherit; color: inherit; }
   --ink-secondary: #5A4A3A;
   --ink-faint: #8B7A65;
   --ink-very-faint: #B0A085;
+  --ink-rgb: 46, 37, 28;
   --line-color: rgba(139, 122, 101, 0.16);
-  --card-border: rgba(46, 37, 28, 0.12);
-  --card-border-strong: rgba(46, 37, 28, 0.25);
-  --card-bg: rgba(46, 37, 28, 0.05);
+  --card-border: rgba(var(--ink-rgb), 0.12);
+  --card-border-strong: rgba(var(--ink-rgb), 0.25);
+  --card-bg: rgba(var(--ink-rgb), 0.05);
   --card-active-bg: rgba(107, 138, 79, 0.18);
-  --hover-bg: rgba(46, 37, 28, 0.04);
-  --focus-bg: rgba(46, 37, 28, 0.07);
+  --hover-bg: rgba(var(--ink-rgb), 0.04);
+  --focus-bg: rgba(var(--ink-rgb), 0.07);
+  --page-bg: rgba(var(--ink-rgb), 0.06);
 }
 
 body {
   font-family: 'Lora', Georgia, serif;
   color: var(--ink-primary);
-  background-color: rgba(46, 37, 28, 0.06);
+  background-color: rgba(var(--ink-rgb), 0.06);
   min-height: 100vh;
   font-size: 14px;
   line-height: 1.55;
@@ -67,7 +69,7 @@ body {
   max-width: 1100px;
   background-color: var(--paper);
   background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, var(--line-color) 31px, var(--line-color) 32px);
-  border: 0.5px solid rgba(46, 37, 28, 0.18);
+  border: 0.5px solid rgba(var(--ink-rgb), 0.18);
   border-radius: 6px;
   padding: 32px 32px 36px 64px;
   position: relative;
@@ -105,7 +107,7 @@ body {
   flex-shrink: 0;
 }
 
-.brand-name { font-size: 14px; font-weight: 500; }
+.brand-name { font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 600; font-style: normal; letter-spacing: 0.2px; }
 .brand-tagline { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 14px; color: var(--accent-2); }
 
 .theme-picker { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -119,7 +121,7 @@ body {
   font-size: 12px;
   border: 0.5px solid var(--card-border);
   border-radius: 5px;
-  background: rgba(46, 37, 28, 0.04);
+  background: rgba(var(--ink-rgb), 0.04);
   cursor: pointer;
   user-select: none;
   transition: background .15s, border-color .15s;
@@ -130,7 +132,7 @@ body {
 .theme-button-dots { display: flex; gap: 2px; }
 .theme-button-dots .theme-dot { width: 8px; height: 8px; }
 .theme-dot { border-radius: 50%; }
-.theme-dot.bordered { border: 0.5px solid rgba(46, 37, 28, 0.3); }
+.theme-dot.bordered { border: 0.5px solid rgba(var(--ink-rgb), 0.3); }
 
 .theme-dropdown-wrap { position: relative; }
 
@@ -141,7 +143,7 @@ body {
   background: var(--paper);
   border: 0.5px solid var(--card-border-strong);
   border-radius: 6px;
-  box-shadow: 0 4px 18px rgba(46, 37, 28, 0.18);
+  box-shadow: 0 4px 18px rgba(var(--ink-rgb), 0.18);
   padding: 6px;
   min-width: 240px;
   z-index: 100;
@@ -158,7 +160,7 @@ body {
 .theme-dropdown-section:first-child { margin-top: 0; }
 
 .theme-dropdown-divider {
-  border-top: 0.5px solid rgba(46, 37, 28, 0.12);
+  border-top: 0.5px solid rgba(var(--ink-rgb), 0.12);
   margin: 6px 0;
 }
 
@@ -201,7 +203,7 @@ body {
   border: 0.5px solid var(--card-border);
   border-radius: 5px;
   overflow: hidden;
-  background: rgba(46, 37, 28, 0.04);
+  background: rgba(var(--ink-rgb), 0.04);
 }
 .font-size-button {
   padding: 6px 11px;
@@ -278,7 +280,7 @@ body.font-large .day-name { font-size: 12px; }
   opacity: 0;
   transition: opacity .25s, transform .25s;
   pointer-events: none;
-  box-shadow: 0 4px 18px rgba(46, 37, 28, 0.25);
+  box-shadow: 0 4px 18px rgba(var(--ink-rgb), 0.25);
 }
 .app-toast.visible {
   opacity: 1;
@@ -350,7 +352,7 @@ body.font-large .day-name { font-size: 12px; }
 .verse-row {
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 0.5px solid rgba(46,37,28,0.15);
+  border-bottom: 0.5px solid rgba(var(--ink-rgb), 0.15);
 }
 
 .verse, .editable {
@@ -481,13 +483,13 @@ body.font-large .day-name { font-size: 12px; }
 .month-name.muted { color: var(--ink-secondary); }
 
 .bar {
-  background: rgba(46,37,28,0.08);
+  background: rgba(var(--ink-rgb), 0.08);
   height: 4px; border-radius: 2px; overflow: hidden;
   margin-bottom: 8px;
 }
 .bar-fill { height: 100%; background: var(--accent-1); transition: width .3s; }
 .bar-thin { height: 3px; }
-.bar-empty { background: rgba(46,37,28,0.05); }
+.bar-empty { background: rgba(var(--ink-rgb), 0.05); }
 
 .month-stats {
   display: flex; justify-content: space-between;
@@ -511,7 +513,7 @@ body.font-large .day-name { font-size: 12px; }
 }
 
 .detail-section {
-  border-top: 0.5px solid rgba(46, 37, 28, 0.2);
+  border-top: 0.5px solid rgba(var(--ink-rgb), 0.2);
   padding-top: 24px;
   margin-top: 4px;
 }
@@ -553,7 +555,7 @@ body.font-large .day-name { font-size: 12px; }
   color: var(--ink-faint);
   margin-bottom: 8px;
   padding-bottom: 6px;
-  border-bottom: 0.5px solid rgba(46,37,28,0.15);
+  border-bottom: 0.5px solid rgba(var(--ink-rgb), 0.15);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -571,7 +573,7 @@ body.font-large .day-name { font-size: 12px; }
   position: relative;
   transition: background .15s;
 }
-.idea-card:hover { background: rgba(46,37,28,0.09); }
+.idea-card:hover { background: rgba(var(--ink-rgb), 0.09); }
 .idea-card.published { background: var(--card-active-bg); }
 
 .idea-title {
@@ -627,6 +629,56 @@ body.font-large .day-name { font-size: 12px; }
   user-select: none;
 }
 .add-button:hover { background: rgba(176, 117, 112, 0.1); }
+
+.todo-category {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 0.5px dashed rgba(var(--ink-rgb), 0.18);
+  background: var(--paper);
+}
+
+.todo-category-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.todo-category-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--accent-2);
+  outline: none;
+  cursor: text;
+  flex: 1;
+  min-width: 0;
+  padding: 1px 4px;
+  margin: 0 -4px;
+  border-radius: 3px;
+}
+.todo-category-name:hover { background: var(--hover-bg); }
+.todo-category-name:focus { background: var(--focus-bg); }
+.todo-category-name:empty::before { content: attr(data-placeholder); color: var(--ink-very-faint); }
+
+.todo-category-delete {
+  cursor: pointer;
+  color: var(--ink-faint);
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 6px;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  user-select: none;
+}
+.todo-category:hover .todo-category-delete { opacity: 0.5; }
+.todo-category-delete:hover { opacity: 1; color: var(--accent-2); }
+
+.add-category-btn {
+  margin-top: 14px;
+  font-style: italic;
+  opacity: 0.85;
+}
 
 .row-item {
   display: flex;
@@ -735,12 +787,12 @@ body.font-large .day-name { font-size: 12px; }
 .meal-row {
   display: grid;
   grid-template-columns: 36px 1fr 1fr 1fr;
-  border-bottom: 0.5px solid rgba(46,37,28,0.1);
+  border-bottom: 0.5px solid rgba(var(--ink-rgb), 0.1);
 }
 .meal-row:last-child { border-bottom: none; }
 
 .meal-row.header {
-  background: rgba(46,37,28,0.04);
+  background: rgba(var(--ink-rgb), 0.04);
   font-size: 11px;
   color: var(--ink-faint);
 }
@@ -876,7 +928,7 @@ body.font-large .day-name { font-size: 12px; }
 .book-author:focus { background: var(--focus-bg); }
 .book-author:empty::before { content: attr(data-placeholder); color: var(--ink-very-faint); font-style: italic; }
 
-.book-progress { background: rgba(46,37,28,0.1); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+.book-progress { background: rgba(var(--ink-rgb), 0.1); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
 .book-progress-fill { height: 100%; background: var(--accent-1); transition: width .3s; }
 
 .book-pages {
@@ -903,7 +955,7 @@ body.font-large .day-name { font-size: 12px; }
 .page-input:focus { border-bottom-color: var(--accent-1); }
 
 .book-today {
-  border-top: 0.5px solid rgba(46,37,28,0.15);
+  border-top: 0.5px solid rgba(var(--ink-rgb), 0.15);
   padding-top: 10px;
   margin-top: 6px;
 }
@@ -953,7 +1005,7 @@ body.font-large .day-name { font-size: 12px; }
   color: var(--accent-2);
   margin-bottom: 8px;
   padding-bottom: 6px;
-  border-bottom: 0.5px solid rgba(46, 37, 28, 0.12);
+  border-bottom: 0.5px solid rgba(var(--ink-rgb), 0.12);
 }
 
 .wish-item {
@@ -980,7 +1032,7 @@ body.font-large .day-name { font-size: 12px; }
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(46, 37, 28, 0.45);
+  background: rgba(var(--ink-rgb), 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -989,7 +1041,7 @@ body.font-large .day-name { font-size: 12px; }
 
 .modal {
   background: var(--paper);
-  border: 0.5px solid rgba(46, 37, 28, 0.3);
+  border: 0.5px solid rgba(var(--ink-rgb), 0.3);
   border-radius: 8px;
   padding: 28px 30px;
   width: 100%;
@@ -1095,7 +1147,7 @@ body.font-large .day-name { font-size: 12px; }
 .footer-actions {
   margin-top: 36px;
   padding-top: 16px;
-  border-top: 0.5px solid rgba(46, 37, 28, 0.15);
+  border-top: 0.5px solid rgba(var(--ink-rgb), 0.15);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1423,6 +1475,7 @@ function getDayData(d) {
   if (!state.days[k]) state.days[k] = {};
   const dd = state.days[k];
   if (!Array.isArray(dd.todos)) dd.todos = [];
+  if (!Array.isArray(dd.todoCategories)) dd.todoCategories = [];
   if (typeof dd.workout !== 'string') dd.workout = '';
   if (typeof dd.reading !== 'object' || !dd.reading) dd.reading = { bookId: null, todayPages: '', note: '' };
   if (typeof dd.verse !== 'string') dd.verse = '';
@@ -1457,13 +1510,46 @@ function mix(c1, c2, t) {
 function applyTheme() {
   const t = getActiveTheme();
   const root = document.documentElement;
-  root.style.setProperty('--paper', t.paper);
+  const isDark = !!(state.meta && state.meta.darkMode);
+
   root.style.setProperty('--accent-1', t.accent1);
   root.style.setProperty('--accent-2', t.accent2);
-  const cardBg = mix(t.paper, '#2E251C', 0.06);
-  const activeBg = mix(t.paper, t.accent1, 0.22);
-  root.style.setProperty('--card-bg', cardBg);
-  root.style.setProperty('--card-active-bg', activeBg);
+
+  if (isDark) {
+    root.style.setProperty('--paper', '#1F1A12');
+    root.style.setProperty('--ink-primary', '#E8DCC0');
+    root.style.setProperty('--ink-secondary', '#BAA890');
+    root.style.setProperty('--ink-faint', '#8C7E6A');
+    root.style.setProperty('--ink-very-faint', '#5C5042');
+    root.style.setProperty('--ink-rgb', '232, 220, 192');
+    root.style.setProperty('--line-color', 'rgba(232, 220, 192, 0.09)');
+    const cardBg = 'rgba(232, 220, 192, 0.05)';
+    const activeBg = mix('#1F1A12', t.accent1, 0.28);
+    root.style.setProperty('--card-bg', cardBg);
+    root.style.setProperty('--card-active-bg', activeBg);
+    document.body.classList.add('dark-mode');
+  } else {
+    root.style.setProperty('--paper', t.paper);
+    root.style.setProperty('--ink-primary', '#2E251C');
+    root.style.setProperty('--ink-secondary', '#5A4A3A');
+    root.style.setProperty('--ink-faint', '#8B7A65');
+    root.style.setProperty('--ink-very-faint', '#B0A085');
+    root.style.setProperty('--ink-rgb', '46, 37, 28');
+    root.style.setProperty('--line-color', 'rgba(139, 122, 101, 0.16)');
+    const cardBg = mix(t.paper, '#2E251C', 0.06);
+    const activeBg = mix(t.paper, t.accent1, 0.22);
+    root.style.setProperty('--card-bg', cardBg);
+    root.style.setProperty('--card-active-bg', activeBg);
+    document.body.classList.remove('dark-mode');
+  }
+}
+
+function toggleDarkMode() {
+  if (!state.meta) state.meta = {};
+  state.meta.darkMode = !state.meta.darkMode;
+  saveState();
+  applyTheme();
+  render();
 }
 
 function applyFontSize() {
@@ -1724,6 +1810,33 @@ function renderFontSizePill() {
   return wrap;
 }
 
+function renderModePill() {
+  const wrap = document.createElement('div');
+  wrap.className = 'font-size-pill mode-pill';
+
+  const current = (state.meta && state.meta.darkMode) ? 'dark' : 'light';
+
+  ['light', 'dark'].forEach(mode => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'font-size-button' + (current === mode ? ' active' : '');
+    b.textContent = mode;
+    b.addEventListener('click', () => {
+      const wantDark = (mode === 'dark');
+      const isDark = !!(state.meta && state.meta.darkMode);
+      if (wantDark === isDark) return;
+      if (!state.meta) state.meta = {};
+      state.meta.darkMode = wantDark;
+      saveState();
+      applyTheme();
+      render();
+    });
+    wrap.appendChild(b);
+  });
+
+  return wrap;
+}
+
 function renderHeaderBand() {
   const avatar = el('div', { class: 'avatar' });
   bindEditable(avatar, () => state.meta.initial, v => state.meta.initial = (v || 'E').slice(0,1));
@@ -1737,6 +1850,7 @@ function renderHeaderBand() {
   const themePicker = document.createElement('div');
   themePicker.className = 'theme-picker';
   themePicker.appendChild(renderThemeDropdown());
+  themePicker.appendChild(renderModePill());
   themePicker.appendChild(renderFontSizePill());
 
   return el('div', { class: 'header-band' }, [
@@ -1793,7 +1907,8 @@ function monthDensity(year, month) {
     const dk = dateKey(dt);
     const dd = state.days[dk];
     if (dd) {
-      const has = (dd.todos && dd.todos.length) || (dd.workout && dd.workout.trim()) || (dd.reading && (dd.reading.todayPages || dd.reading.note));
+      const hasTodos = (dd.todos && dd.todos.length) || (dd.todoCategories && dd.todoCategories.some(c => c.todos && c.todos.length));
+      const has = hasTodos || (dd.workout && dd.workout.trim()) || (dd.reading && (dd.reading.todayPages || dd.reading.note));
       if (has) filled++;
     }
   }
@@ -2165,7 +2280,10 @@ function renderWeekView() {
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday); d.setDate(d.getDate()+i);
     const dd = state.days[dateKey(d)];
-    if (dd && ((dd.todos && dd.todos.length) || (dd.workout && dd.workout.trim()) || (dd.reading && (dd.reading.todayPages || dd.reading.note)))) daysFilled++;
+    if (dd) {
+      const hasTodos = (dd.todos && dd.todos.length) || (dd.todoCategories && dd.todoCategories.some(c => c.todos && c.todos.length));
+      if (hasTodos || (dd.workout && dd.workout.trim()) || (dd.reading && (dd.reading.todayPages || dd.reading.note))) daysFilled++;
+    }
   }
   wrap.appendChild(el('div', { class: 'subtitle', text: goalsD + ' / ' + goalsT + ' goals, ' + daysFilled + ' / 7 days filled' }));
 
@@ -2224,7 +2342,9 @@ function renderWeekView() {
     const d = new Date(monday); d.setDate(d.getDate()+i);
     const isToday = (dateKey(d) === dateKey(today));
     const dd = state.days[dateKey(d)];
-    const todos = (dd && dd.todos) || [];
+    const mainTodos = (dd && dd.todos) || [];
+    const catTodos = (dd && dd.todoCategories) ? dd.todoCategories.flatMap(c => c.todos || []) : [];
+    const todos = [...mainTodos, ...catTodos];
     const todosT = todos.length, todosD = todos.filter(t => t.done).length;
     const isPast = d < new Date(today.getFullYear(), today.getMonth(), today.getDate()) && !isToday;
 
@@ -2309,8 +2429,9 @@ function renderDayView() {
     el('div', { class: 'title-status', text: isToday ? 'today' : DAYS_TR_LONG[(d.getDay()+6)%7] })
   ]));
 
-  const todosT = (dd.todos || []).length;
-  const todosD = (dd.todos || []).filter(t => t.done).length;
+  const allTodos = [...(dd.todos || []), ...(dd.todoCategories || []).flatMap(c => c.todos || [])];
+  const todosT = allTodos.length;
+  const todosD = allTodos.filter(t => t.done).length;
   const todayBook = getActiveBook();
   const todayPages = (dd.reading && dd.reading.todayPages) ? dd.reading.todayPages : 0;
   wrap.appendChild(el('div', { class: 'subtitle', text: (todosT - todosD) + ' to-do, ' + (dd.workout && dd.workout.trim() ? '1 workout' : '0 workouts') + ', ' + (todayPages || 0) + ' pages' }));
@@ -2343,6 +2464,68 @@ function renderDayView() {
       setTimeout(() => {
         const items = document.querySelectorAll('.row-text');
         if (items.length) items[items.length-1].focus();
+      }, 0);
+    }
+  }));
+
+  // Categories
+  (dd.todoCategories || []).forEach(cat => {
+    if (!Array.isArray(cat.todos)) cat.todos = [];
+    const catWrap = el('div', { class: 'todo-category' });
+
+    const catHeader = el('div', { class: 'todo-category-header' });
+    const catName = el('span', { class: 'todo-category-name', data: { placeholder: 'category name' } });
+    bindEditable(catName, () => cat.name, v => cat.name = v);
+    catHeader.appendChild(catName);
+    catHeader.appendChild(el('span', {
+      class: 'todo-category-delete',
+      text: '×',
+      title: 'remove category',
+      onclick: () => {
+        const hasItems = cat.todos && cat.todos.length;
+        if (hasItems && !confirm('Remove this category and its items?')) return;
+        dd.todoCategories = dd.todoCategories.filter(c => c.id !== cat.id);
+        saveState(); render();
+      }
+    }));
+    catWrap.appendChild(catHeader);
+
+    cat.todos.forEach(t => {
+      catWrap.appendChild(rowItem(
+        t,
+        () => t.text,
+        v => t.text = v,
+        () => { t.done = !t.done; saveState(); render(); },
+        () => { cat.todos = cat.todos.filter(x => x.id !== t.id); saveState(); render(); }
+      ));
+    });
+
+    catWrap.appendChild(el('div', {
+      class: 'add-button',
+      text: '+ add',
+      onclick: () => {
+        cat.todos.push({ id: uid(), text: '', done: false });
+        saveState(); render();
+        setTimeout(() => {
+          const items = document.querySelectorAll('.row-text');
+          if (items.length) items[items.length-1].focus();
+        }, 0);
+      }
+    }));
+
+    todoCol.appendChild(catWrap);
+  });
+
+  todoCol.appendChild(el('div', {
+    class: 'add-button add-category-btn',
+    text: '+ add category',
+    onclick: () => {
+      if (!dd.todoCategories) dd.todoCategories = [];
+      dd.todoCategories.push({ id: uid(), name: '', todos: [] });
+      saveState(); render();
+      setTimeout(() => {
+        const names = document.querySelectorAll('.todo-category-name');
+        if (names.length) names[names.length-1].focus();
       }, 0);
     }
   }));
