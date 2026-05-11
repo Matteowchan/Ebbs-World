@@ -875,6 +875,44 @@ body.font-large .day-name { font-size: 12px; }
 }
 .meal-row.header > div { padding: 7px 10px; }
 
+.shopping-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.shopping-col {
+  background: var(--card-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 6px;
+  padding: 10px 11px;
+  min-width: 0;
+}
+
+.shopping-cat-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--accent-2);
+  margin: 0 -4px 7px;
+  padding: 1px 4px 5px;
+  border-bottom: 0.5px solid rgba(var(--ink-rgb), 0.12);
+  border-radius: 3px;
+  outline: none;
+  cursor: text;
+}
+.shopping-cat-name:hover { background: var(--hover-bg); }
+.shopping-cat-name:focus { background: var(--focus-bg); }
+.shopping-cat-name:empty::before { content: attr(data-placeholder); color: var(--ink-very-faint); }
+
+.shopping-col .row-item { margin-bottom: 4px; font-size: 12px; }
+.shopping-col .add-button { font-size: 11px; margin-top: 2px; }
+
+@media (max-width: 720px) {
+  .shopping-list { grid-template-columns: 1fr; gap: 8px; }
+}
+
 .meal-cell {
   padding: 7px 10px;
   font-size: 12px;
@@ -1612,6 +1650,11 @@ function getWeekData(d) {
   if (typeof wd.intent !== 'string') wd.intent = '';
   if (!Array.isArray(wd.goals)) wd.goals = [];
   if (typeof wd.meals !== 'object' || !wd.meals) wd.meals = {};
+  if (!Array.isArray(wd.shopping)) wd.shopping = [
+    { id: uid(), name: 'produce', items: [] },
+    { id: uid(), name: 'pantry', items: [] },
+    { id: uid(), name: 'other', items: [] }
+  ];
   if (typeof wd.verse !== 'string') wd.verse = '';
   if (!Array.isArray(wd.gratitude)) wd.gratitude = [];
   return wd;
@@ -2585,6 +2628,9 @@ function renderWeekView() {
   right.appendChild(el('div', { class: 'section-label', text: 'Meal plan' }));
   right.appendChild(renderMealTable(wd, monday));
 
+  right.appendChild(el('div', { class: 'section-label', text: 'Shopping list', style: 'margin-top:18px;' }));
+  right.appendChild(renderShoppingList(wd));
+
   twoCol.appendChild(left);
   twoCol.appendChild(right);
   wrap.appendChild(twoCol);
@@ -2623,6 +2669,50 @@ function renderWeekView() {
 
   // Minnet
   wrap.appendChild(renderGratitudeSection(wd));
+
+  return wrap;
+}
+
+function renderShoppingList(wd) {
+  const wrap = el('div', { class: 'shopping-list' });
+
+  if (!Array.isArray(wd.shopping)) wd.shopping = [];
+
+  wd.shopping.forEach(cat => {
+    if (!Array.isArray(cat.items)) cat.items = [];
+    const col = el('div', { class: 'shopping-col' });
+
+    const header = document.createElement('div');
+    header.className = 'shopping-cat-name';
+    header.setAttribute('data-placeholder', 'category');
+    bindEditable(header, () => cat.name, v => { cat.name = v; saveState(); });
+    col.appendChild(header);
+
+    cat.items.forEach(item => {
+      col.appendChild(rowItem(
+        item,
+        () => item.text,
+        v => item.text = v,
+        () => { item.done = !item.done; saveState(); render(); },
+        () => { cat.items = cat.items.filter(x => x.id !== item.id); saveState(); render(); }
+      ));
+    });
+
+    col.appendChild(el('div', {
+      class: 'add-button',
+      text: '+ add',
+      onclick: () => {
+        cat.items.push({ id: uid(), text: '', done: false });
+        saveState(); render();
+        setTimeout(() => {
+          const items = col.querySelectorAll('.row-text');
+          if (items.length) items[items.length-1].focus();
+        }, 0);
+      }
+    }));
+
+    wrap.appendChild(col);
+  });
 
   return wrap;
 }
