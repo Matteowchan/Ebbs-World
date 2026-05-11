@@ -637,6 +637,83 @@ body.font-large .day-name { font-size: 12px; }
   background: var(--paper);
 }
 
+.month-goals {
+  display: grid;
+  grid-template-columns: repeat(var(--week-cols, 5), 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.month-goals .todo-category {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.month-goals .goals-col-header-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  min-height: 20px;
+}
+
+.month-goals .goals-col-header {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-primary);
+  padding: 1px 4px;
+  margin-left: -4px;
+  border-radius: 3px;
+  outline: none;
+  cursor: text;
+  flex: 1;
+  min-width: 0;
+}
+.month-goals .goals-col-header:hover { background: var(--hover-bg); }
+.month-goals .goals-col-header:focus { background: var(--focus-bg); }
+.month-goals .goals-col-header:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-very-faint);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.month-goals .col-delete {
+  cursor: pointer;
+  color: var(--ink-faint);
+  font-size: 15px;
+  line-height: 1;
+  padding: 2px 6px;
+  opacity: 0;
+  user-select: none;
+  flex-shrink: 0;
+}
+.month-goals .goals-col:hover .col-delete { opacity: 0.5; }
+.month-goals .col-delete:hover { opacity: 1; color: var(--accent-2); }
+
+.month-goals .add-category-col {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 0;
+}
+
+@media (max-width: 720px) {
+  .month-goals .col-delete { opacity: 0.4; }
+}
+
+@media (max-width: 960px) {
+  .month-goals { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 720px) {
+  .month-goals { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+}
+@media (max-width: 460px) {
+  .month-goals { grid-template-columns: 1fr; gap: 18px; }
+}
+
 .todo-category-header {
   display: flex;
   align-items: center;
@@ -998,14 +1075,46 @@ body.font-large .day-name { font-size: 12px; }
   padding: 12px 14px;
 }
 
+.wish-cat-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 0.5px solid rgba(var(--ink-rgb), 0.12);
+}
+
 .wish-cat-name {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-style: italic;
   font-size: 16px;
   color: var(--accent-2);
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 0.5px solid rgba(var(--ink-rgb), 0.12);
+  flex: 1;
+  min-width: 0;
+  padding: 1px 4px;
+  margin-left: -4px;
+  border-radius: 3px;
+  outline: none;
+  cursor: text;
+}
+.wish-cat-name:hover { background: var(--hover-bg); }
+.wish-cat-name:focus { background: var(--focus-bg); }
+.wish-cat-name:empty::before { content: attr(data-placeholder); color: var(--ink-very-faint); }
+
+.wish-cat-delete {
+  cursor: pointer;
+  color: var(--ink-faint);
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 6px;
+  opacity: 0;
+  user-select: none;
+  flex-shrink: 0;
+}
+.wish-cat-card:hover .wish-cat-delete { opacity: 0.5; }
+.wish-cat-delete:hover { opacity: 1; color: var(--accent-2); }
+@media (max-width: 720px) {
+  .wish-cat-delete { opacity: 0.4; }
 }
 
 .wish-item {
@@ -1452,7 +1561,45 @@ function getMonthData(year, month) {
   if (!state.months[k]) state.months[k] = {};
   const md = state.months[k];
   if (!Array.isArray(md.contentIdeas)) md.contentIdeas = [];
+  if (!Array.isArray(md.monthGoals)) md.monthGoals = [];
+  if (!Array.isArray(md.goalCategories)) md.goalCategories = [];
+  // One-time migration: bring old kanban items into the new goals list
+  if (!md.contentIdeasMigrated && md.contentIdeas.length > 0 && md.monthGoals.length === 0) {
+    md.contentIdeas.forEach(it => {
+      if (it && it.title) {
+        md.monthGoals.push({
+          id: it.id || uid(),
+          text: it.title,
+          done: (it.status === 'paylasildi' || it.status === 'cekildi')
+        });
+      }
+    });
+    md.contentIdeasMigrated = true;
+  }
   if (!Array.isArray(md.wishes)) md.wishes = [];
+  if (!Array.isArray(md.wishCategories)) md.wishCategories = [];
+  // One-time migration of flat wishes into category objects
+  if (!md.wishesMigrated) {
+    if (md.wishes.length > 0) {
+      const grouped = {};
+      const order = [];
+      md.wishes.forEach(w => {
+        const c = (w && w.category) ? w.category : 'general';
+        if (!grouped[c]) { grouped[c] = []; order.push(c); }
+        grouped[c].push({ id: (w && w.id) ? w.id : uid(), text: (w && w.text) ? w.text : '' });
+      });
+      order.forEach(name => {
+        md.wishCategories.push({ id: uid(), name, wishes: grouped[name] });
+      });
+    } else if (md.wishCategories.length === 0) {
+      md.wishCategories = [
+        { id: uid(), name: 'personal', wishes: [] },
+        { id: uid(), name: 'content', wishes: [] },
+        { id: uid(), name: 'work', wishes: [] }
+      ];
+    }
+    md.wishesMigrated = true;
+  }
   if (typeof md.verse !== 'string') md.verse = '';
   if (!Array.isArray(md.gratitude)) md.gratitude = [];
   return md;
@@ -1968,10 +2115,11 @@ function renderYearView() {
 
     if (isFuture) {
       const md = state.months[monthKey(viewState.year, m)];
-      const wishCount = md && md.wishes ? md.wishes.length : 0;
+      const allWishes = md && md.wishCategories ? md.wishCategories.flatMap(c => (c.wishes || []).map(w => ({ category: c.name, text: w.text }))) : [];
+      const wishCount = allWishes.filter(w => w.text && w.text.trim()).length;
       if (wishCount > 0) {
         card.appendChild(el('div', { class: 'future-summary', text: wishCount + ' wishes' }));
-        const sample = md.wishes.slice(0, 2).map(w => (w.category ? w.category + ', ' : '') + (w.text || '')).join('  •  ');
+        const sample = allWishes.filter(w => w.text && w.text.trim()).slice(0, 2).map(w => (w.category ? w.category + ', ' : '') + w.text).join('  •  ');
         card.appendChild(el('div', { class: 'future-list', text: sample, style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;' }));
       } else {
         card.appendChild(el('div', { class: 'future-summary', text: 'Wishes and plans', style: 'color:var(--ink-faint)' }));
@@ -2013,13 +2161,15 @@ function renderMonthView() {
 
   // Month subtitle stats
   const weeks = getWeeksOfMonth(year, month);
-  const totalIdeas = (md.contentIdeas || []).length;
+  const allMonthGoals = [...(md.monthGoals || []), ...(md.goalCategories || []).flatMap(c => c.goals || [])];
+  const mGoalsT = allMonthGoals.length;
+  const mGoalsD = allMonthGoals.filter(g => g.done).length;
   let goalsDone = 0, goalsTotal = 0;
   weeks.forEach(monday => {
     const wd = state.weeks[weekKey(monday)];
     if (wd && wd.goals) { goalsTotal += wd.goals.length; goalsDone += wd.goals.filter(g => g.done).length; }
   });
-  wrap.appendChild(el('div', { class: 'subtitle', text: weeks.length + ' weeks, ' + totalIdeas + ' content ideas, ' + goalsDone + ' / ' + goalsTotal + ' goals' }));
+  wrap.appendChild(el('div', { class: 'subtitle', text: weeks.length + ' weeks, ' + mGoalsD + ' / ' + mGoalsT + ' monthly goals, ' + goalsDone + ' / ' + goalsTotal + ' weekly goals' }));
 
   const monthVerse = el('span', { class: 'verse', style: 'color:var(--accent-2);margin-bottom:22px;display:block;', data: { placeholder: '{ start of month verse }' } });
   bindEditable(monthVerse, () => md.verse, v => md.verse = v);
@@ -2057,12 +2207,89 @@ function renderMonthView() {
     wrap.appendChild(weeksWrap);
   }
 
-  // Content ideas kanban
-  wrap.appendChild(el('div', { class: 'section-label', text: 'Content ideas', style: 'margin-top:24px;' }));
-  wrap.appendChild(renderKanban(md));
+  // Goals of the month
+  wrap.appendChild(el('div', { class: 'section-label', text: 'Goals of the month', style: 'margin-top:24px;' }));
+  wrap.appendChild(renderMonthGoals(md, weeks.length));
 
   // Minnet
   wrap.appendChild(renderGratitudeSection(md));
+
+  return wrap;
+}
+
+function renderMonthGoals(md, weekCount) {
+  const wrap = el('div', { class: 'month-goals' });
+  wrap.style.setProperty('--week-cols', Math.max(weekCount || 5, 2));
+
+  // Category columns
+  (md.goalCategories || []).forEach(cat => {
+    if (!Array.isArray(cat.goals)) cat.goals = [];
+    const col = el('div', { class: 'goals-col cat-col' });
+
+    // Header row with editable name and delete OUTSIDE the contenteditable
+    const headerRow = el('div', { class: 'goals-col-header-row' });
+    const header = el('div', { class: 'goals-col-header', data: { placeholder: 'category name' } });
+    bindEditable(header, () => cat.name, v => cat.name = v);
+    headerRow.appendChild(header);
+
+    const del = document.createElement('span');
+    del.className = 'col-delete';
+    del.textContent = '×';
+    del.title = 'remove category';
+    del.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); });
+    del.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const hasItems = cat.goals && cat.goals.length;
+      if (hasItems && !confirm('Remove this category and its goals?')) return;
+      md.goalCategories = md.goalCategories.filter(c => c.id !== cat.id);
+      saveState(); render();
+    });
+    headerRow.appendChild(del);
+    col.appendChild(headerRow);
+
+    cat.goals.forEach(g => {
+      col.appendChild(rowItem(
+        g,
+        () => g.text,
+        v => g.text = v,
+        () => { g.done = !g.done; saveState(); render(); },
+        () => { cat.goals = cat.goals.filter(x => x.id !== g.id); saveState(); render(); }
+      ));
+    });
+    col.appendChild(el('div', {
+      class: 'add-button',
+      text: '+ add goal',
+      onclick: () => {
+        cat.goals.push({ id: uid(), text: '', done: false });
+        saveState(); render();
+        setTimeout(() => {
+          const items = col.querySelectorAll('.row-text');
+          if (items.length) items[items.length-1].focus();
+        }, 0);
+      }
+    }));
+    wrap.appendChild(col);
+  });
+
+  // Add category column at the end
+  const addCol = el('div', { class: 'goals-col add-category-col' });
+  const addSpacer = el('div', { class: 'goals-col-header-row' });
+  addCol.appendChild(addSpacer);
+  addCol.appendChild(el('div', {
+    class: 'add-button add-category-btn',
+    text: '+ add category',
+    onclick: () => {
+      if (!md.goalCategories) md.goalCategories = [];
+      md.goalCategories.push({ id: uid(), name: '', goals: [] });
+      saveState(); render();
+      setTimeout(() => {
+        const headers = document.querySelectorAll('.month-goals .goals-col-header');
+        if (headers.length) headers[headers.length-1].focus();
+      }, 0);
+    }
+  }));
+  wrap.appendChild(addCol);
 
   return wrap;
 }
@@ -2197,34 +2424,41 @@ function renderWishes(md) {
   const wrap = el('div');
   wrap.appendChild(el('div', { class: 'section-label', text: 'Wishes and plans', style: 'margin-top:18px;color:var(--accent-2);' }));
 
-  // Group by category
-  const cats = {};
-  (md.wishes || []).forEach(w => {
-    const c = w.category || 'genel';
-    if (!cats[c]) cats[c] = [];
-    cats[c].push(w);
-  });
-  // Ensure default categories show even if empty
-  ['personal','content','work'].forEach(c => { if (!cats[c]) cats[c] = []; });
-
   const grid = el('div', { class: 'wishes-grid' });
-  Object.keys(cats).forEach(cat => {
+
+  (md.wishCategories || []).forEach(cat => {
+    if (!Array.isArray(cat.wishes)) cat.wishes = [];
     const card = el('div', { class: 'wish-cat-card' });
-    const catName = el('div', { class: 'wish-cat-name brand-edit-inline' });
-    bindEditable(catName, () => cat, v => {
-      if (!v || v === cat) return;
-      cats[cat].forEach(w => w.category = v);
+
+    const headerRow = el('div', { class: 'wish-cat-header' });
+    const catName = document.createElement('div');
+    catName.className = 'wish-cat-name brand-edit-inline';
+    bindEditable(catName, () => cat.name, v => { cat.name = v; saveState(); });
+    headerRow.appendChild(catName);
+
+    const del = document.createElement('span');
+    del.className = 'wish-cat-delete';
+    del.textContent = '×';
+    del.title = 'remove category';
+    del.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); });
+    del.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const hasItems = cat.wishes && cat.wishes.length;
+      if (hasItems && !confirm('Remove this category and its items?')) return;
+      md.wishCategories = md.wishCategories.filter(c => c.id !== cat.id);
       saveState(); render();
     });
-    card.appendChild(catName);
+    headerRow.appendChild(del);
+    card.appendChild(headerRow);
 
-    cats[cat].forEach(w => {
+    cat.wishes.forEach(w => {
       const itemEl = el('div', { class: 'wish-item' });
       const txt = el('span', { class: 'wish-text' });
       bindEditable(txt, () => w.text, v => w.text = v);
-      const del = el('span', { class: 'row-delete', text: '×', onclick: () => { md.wishes = md.wishes.filter(x => x.id !== w.id); saveState(); render(); } });
+      const wdel = el('span', { class: 'row-delete', text: '×', onclick: () => { cat.wishes = cat.wishes.filter(x => x.id !== w.id); saveState(); render(); } });
       itemEl.appendChild(txt);
-      itemEl.appendChild(del);
+      itemEl.appendChild(wdel);
       card.appendChild(itemEl);
     });
 
@@ -2232,11 +2466,10 @@ function renderWishes(md) {
       class: 'add-button',
       text: '+ add',
       onclick: () => {
-        if (!md.wishes) md.wishes = [];
-        md.wishes.push({ id: uid(), category: cat, text: '' });
+        cat.wishes.push({ id: uid(), text: '' });
         saveState(); render();
         setTimeout(() => {
-          const last = document.querySelectorAll('.wish-text');
+          const last = card.querySelectorAll('.wish-text');
           if (last.length) last[last.length-1].focus();
         }, 0);
       }
@@ -2247,12 +2480,33 @@ function renderWishes(md) {
 
   // Add new category button
   const newCatBtn = el('div', { class: 'add-button', text: '+ category', style: 'margin-top:10px;', onclick: () => {
-    const name = prompt('New category name:');
-    if (name && name.trim()) {
-      if (!md.wishes) md.wishes = [];
-      md.wishes.push({ id: uid(), category: name.trim(), text: '' });
-      saveState(); render();
-    }
+    if (!md.wishCategories) md.wishCategories = [];
+    const existing = new Set((md.wishCategories || []).map(c => c.name));
+    let n = 0;
+    let placeholderName;
+    do {
+      n++;
+      placeholderName = n === 1 ? 'new category' : 'new category ' + n;
+    } while (existing.has(placeholderName));
+    const newCat = { id: uid(), name: placeholderName, wishes: [] };
+    md.wishCategories.push(newCat);
+    saveState(); render();
+    setTimeout(() => {
+      const names = document.querySelectorAll('.wish-cat-name');
+      for (const nm of names) {
+        if (nm.textContent === placeholderName) {
+          nm.focus();
+          try {
+            const range = document.createRange();
+            range.selectNodeContents(nm);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          } catch {}
+          break;
+        }
+      }
+    }, 50);
   } });
 
   wrap.appendChild(grid);
