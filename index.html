@@ -2156,8 +2156,8 @@ function renderMonthView() {
   wrap.appendChild(el('div', { class: 'section-label', text: 'Goals of the month', style: 'margin-top:24px;' }));
   wrap.appendChild(renderMonthGoals(md, weeks.length));
 
-  // Minnet
-  wrap.appendChild(renderGratitudeSection(md));
+  // Meal plan
+  wrap.appendChild(renderGratitudeSection(md, 'meal plan'));
 
   return wrap;
 }
