@@ -23,6 +23,7 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+html { background-color: var(--page-bg); }
 button { background: none; border: none; padding: 0; cursor: pointer; font: inherit; color: inherit; }
 input, textarea, select { font: inherit; color: inherit; }
 
@@ -48,7 +49,7 @@ input, textarea, select { font: inherit; color: inherit; }
 body {
   font-family: 'Lora', Georgia, serif;
   color: var(--ink-primary);
-  background-color: rgba(var(--ink-rgb), 0.06);
+  background-color: var(--page-bg);
   min-height: 100vh;
   font-size: 14px;
   line-height: 1.55;
@@ -252,7 +253,6 @@ body.font-large .row-item, body.font-large .row-text { font-size: 15px; }
 body.font-large .idea-title { font-size: 14px; }
 body.font-large .meal-cell { font-size: 13px; }
 body.font-large .day-num { font-size: 20px; }
-body.font-large .book-title { font-size: 19px; }
 body.font-large .intent-text { font-size: 16px; }
 body.font-large .workout-text { font-size: 16px; }
 body.font-large .breadcrumb { font-size: 13px; }
@@ -261,7 +261,6 @@ body.font-large .section-label { font-size: 12px; }
 body.font-large .month-stats { font-size: 12px; }
 body.font-large .brand-tagline, body.font-large .brand-name { font-size: 16px; }
 body.font-large .week-range { font-size: 16px; }
-body.font-large .book-today-note { font-size: 14px; }
 body.font-large .day-name { font-size: 12px; }
 
 /* Toast bildirimi */
@@ -814,7 +813,7 @@ body.font-large .day-name { font-size: 12px; }
 
 .three-col {
   display: grid;
-  grid-template-columns: 1fr 1.05fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
@@ -1002,98 +1001,6 @@ body.font-large .day-name { font-size: 12px; }
 .workout-text:hover { background: var(--hover-bg); }
 .workout-text:focus { background: var(--focus-bg); }
 .workout-text:empty::before {
-  content: attr(data-placeholder);
-  color: var(--ink-very-faint);
-  pointer-events: none;
-}
-
-.reading-card {
-  background: var(--card-bg);
-  border: 0.5px solid var(--card-border);
-  border-radius: 6px;
-  padding: 12px 14px;
-}
-
-.book-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-style: italic;
-  font-size: 17px;
-  color: var(--ink-primary);
-  outline: none;
-  border-radius: 3px;
-  padding: 0 4px;
-  margin: 0 -4px 2px;
-  cursor: text;
-}
-.book-title:hover { background: var(--hover-bg); }
-.book-title:focus { background: var(--focus-bg); }
-.book-title:empty::before { content: attr(data-placeholder); color: var(--ink-very-faint); }
-
-.book-author {
-  font-size: 11px;
-  color: var(--ink-secondary);
-  margin-bottom: 12px;
-  outline: none;
-  border-radius: 3px;
-  padding: 2px 4px;
-  margin: 0 -4px 12px;
-  cursor: text;
-}
-.book-author:hover { background: var(--hover-bg); }
-.book-author:focus { background: var(--focus-bg); }
-.book-author:empty::before { content: attr(data-placeholder); color: var(--ink-very-faint); font-style: italic; }
-
-.book-progress { background: rgba(var(--ink-rgb), 0.1); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
-.book-progress-fill { height: 100%; background: var(--accent-1); transition: width .3s; }
-
-.book-pages {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--ink-secondary);
-  margin-bottom: 12px;
-  align-items: center;
-}
-
-.page-input {
-  background: transparent;
-  border: none;
-  border-bottom: 0.5px dashed var(--ink-very-faint);
-  width: 38px;
-  text-align: center;
-  font-size: 11px;
-  outline: none;
-  color: var(--ink-primary);
-  font-family: inherit;
-  padding: 1px 2px;
-}
-.page-input:focus { border-bottom-color: var(--accent-1); }
-
-.book-today {
-  border-top: 0.5px solid rgba(var(--ink-rgb), 0.15);
-  padding-top: 10px;
-  margin-top: 6px;
-}
-.book-today-pages {
-  font-size: 12px;
-  color: var(--ink-primary);
-  margin-bottom: 4px;
-}
-.book-today-note {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-style: italic;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-secondary);
-  outline: none;
-  border-radius: 3px;
-  padding: 2px 4px;
-  margin: -2px -4px;
-  min-height: 1.5em;
-}
-.book-today-note:hover { background: var(--hover-bg); }
-.book-today-note:focus { background: var(--focus-bg); color: var(--ink-primary); }
-.book-today-note:empty::before {
   content: attr(data-placeholder);
   color: var(--ink-very-faint);
   pointer-events: none;
@@ -1559,8 +1466,7 @@ function defaultState() {
     },
     months: {},
     weeks: {},
-    days: {},
-    books: []
+    days: {}
   };
 }
 
@@ -1574,8 +1480,7 @@ function loadState() {
       meta: Object.assign({}, fresh.meta, parsed.meta || {}),
       months: parsed.months || {},
       weeks: parsed.weeks || {},
-      days: parsed.days || {},
-      books: parsed.books || []
+      days: parsed.days || {}
     });
   } catch (e) {
     return defaultState();
@@ -1667,14 +1572,9 @@ function getDayData(d) {
   if (!Array.isArray(dd.todos)) dd.todos = [];
   if (!Array.isArray(dd.todoCategories)) dd.todoCategories = [];
   if (typeof dd.workout !== 'string') dd.workout = '';
-  if (typeof dd.reading !== 'object' || !dd.reading) dd.reading = { bookId: null, todayPages: '', note: '' };
   if (typeof dd.verse !== 'string') dd.verse = '';
   if (!Array.isArray(dd.gratitude)) dd.gratitude = [];
   return dd;
-}
-
-function getActiveBook() {
-  return state.books.find(b => b.active) || state.books[0] || null;
 }
 
 function getAllThemes() { return [...PRESET_THEMES, ...state.meta.customThemes]; }
@@ -1713,6 +1613,7 @@ function applyTheme() {
     root.style.setProperty('--ink-very-faint', '#5C5042');
     root.style.setProperty('--ink-rgb', '232, 220, 192');
     root.style.setProperty('--line-color', 'rgba(232, 220, 192, 0.09)');
+    root.style.setProperty('--page-bg', '#15110A');
     const cardBg = 'rgba(232, 220, 192, 0.05)';
     const activeBg = mix('#1F1A12', t.accent1, 0.28);
     root.style.setProperty('--card-bg', cardBg);
@@ -1726,6 +1627,7 @@ function applyTheme() {
     root.style.setProperty('--ink-very-faint', '#B0A085');
     root.style.setProperty('--ink-rgb', '46, 37, 28');
     root.style.setProperty('--line-color', 'rgba(139, 122, 101, 0.16)');
+    root.style.setProperty('--page-bg', 'rgba(46, 37, 28, 0.06)');
     const cardBg = mix(t.paper, '#2E251C', 0.06);
     const activeBg = mix(t.paper, t.accent1, 0.22);
     root.style.setProperty('--card-bg', cardBg);
@@ -2098,7 +2000,7 @@ function monthDensity(year, month) {
     const dd = state.days[dk];
     if (dd) {
       const hasTodos = (dd.todos && dd.todos.length) || (dd.todoCategories && dd.todoCategories.some(c => c.todos && c.todos.length));
-      const has = hasTodos || (dd.workout && dd.workout.trim()) || (dd.reading && (dd.reading.todayPages || dd.reading.note));
+      const has = hasTodos || (dd.workout && dd.workout.trim());
       if (has) filled++;
     }
   }
@@ -2337,12 +2239,12 @@ function renderMonthGoals(md, weekCount) {
   return wrap;
 }
 
-function renderGratitudeSection(holder) {
+function renderGratitudeSection(holder, label) {
   if (!Array.isArray(holder.gratitude)) holder.gratitude = [];
   const list = holder.gratitude;
 
   const wrap = el('div', { class: 'gratitude-section' });
-  wrap.appendChild(el('div', { class: 'section-label', text: 'gratitude' }));
+  wrap.appendChild(el('div', { class: 'section-label', text: label || 'gratitude' }));
 
   const card = el('div', { class: 'gratitude-card' });
   const rowCount = Math.max(3, list.length);
@@ -2579,7 +2481,7 @@ function renderWeekView() {
     const dd = state.days[dateKey(d)];
     if (dd) {
       const hasTodos = (dd.todos && dd.todos.length) || (dd.todoCategories && dd.todoCategories.some(c => c.todos && c.todos.length));
-      if (hasTodos || (dd.workout && dd.workout.trim()) || (dd.reading && (dd.reading.todayPages || dd.reading.note))) daysFilled++;
+      if (hasTodos || (dd.workout && dd.workout.trim())) daysFilled++;
     }
   }
   wrap.appendChild(el('div', { class: 'subtitle', text: goalsD + ' / ' + goalsT + ' goals, ' + daysFilled + ' / 7 days filled' }));
@@ -2652,7 +2554,7 @@ function renderWeekView() {
     if (isToday) status = 'today';
     else if (todosT > 0 && todosD === todosT) status = 'done';
     else if (todosT > 0) status = todosD + ' / ' + todosT;
-    else if (dd && (dd.workout || (dd.reading && dd.reading.todayPages))) status = 'filled';
+    else if (dd && dd.workout) status = 'filled';
     else status = isPast ? 'empty' : '—';
 
     const card = el('div', {
@@ -2776,9 +2678,7 @@ function renderDayView() {
   const allTodos = [...(dd.todos || []), ...(dd.todoCategories || []).flatMap(c => c.todos || [])];
   const todosT = allTodos.length;
   const todosD = allTodos.filter(t => t.done).length;
-  const todayBook = getActiveBook();
-  const todayPages = (dd.reading && dd.reading.todayPages) ? dd.reading.todayPages : 0;
-  wrap.appendChild(el('div', { class: 'subtitle', text: (todosT - todosD) + ' to-do, ' + (dd.workout && dd.workout.trim() ? '1 workout' : '0 workouts') + ', ' + (todayPages || 0) + ' pages' }));
+  wrap.appendChild(el('div', { class: 'subtitle', text: (todosT - todosD) + ' to-do, ' + (dd.workout && dd.workout.trim() ? '1 note' : '0 notes') }));
 
   const verseSpan = el('span', { class: 'verse', style: 'color:var(--accent-2);margin-bottom:22px;display:block;', data: { placeholder: '{ verse for the day }' } });
   bindEditable(verseSpan, () => dd.verse, v => dd.verse = v);
@@ -2874,111 +2774,24 @@ function renderDayView() {
     }
   }));
 
-  // Workout
+  // Notes
   const workoutCol = el('div');
-  workoutCol.appendChild(el('div', { class: 'section-label', text: 'Workout' }));
+  workoutCol.appendChild(el('div', { class: 'section-label', text: 'Notes' }));
   const woCard = el('div', { class: 'workout-card' });
-  woCard.appendChild(el('div', { class: 'workout-hint', text: 'write what you did today' }));
-  const woText = el('div', { class: 'workout-text', data: { placeholder: 'what did you do today?' } });
+  woCard.appendChild(el('div', { class: 'workout-hint', text: 'anything you want to note down' }));
+  const woText = el('div', { class: 'workout-text', data: { placeholder: 'your notes...' } });
   bindEditable(woText, () => dd.workout, v => dd.workout = v, { multiline: true });
   woCard.appendChild(woText);
   workoutCol.appendChild(woCard);
 
-  // Reading
-  const readCol = el('div');
-  readCol.appendChild(el('div', { class: 'section-label', text: 'Reading' }));
-  readCol.appendChild(renderReadingCard(dd));
-
   cols.appendChild(todoCol);
   cols.appendChild(workoutCol);
-  cols.appendChild(readCol);
   wrap.appendChild(cols);
 
-  // Minnet
-  wrap.appendChild(renderGratitudeSection(dd));
+  // Meal plan (gratitude bölümü, başlığı meal plan olarak)
+  wrap.appendChild(renderGratitudeSection(dd, 'meal plan'));
 
   return wrap;
-}
-
-function renderReadingCard(dd) {
-  const card = el('div', { class: 'reading-card' });
-  const book = getActiveBook();
-
-  // Book selector / display
-  if (!book) {
-    // No book yet, prompt to add one
-    card.appendChild(el('div', { class: 'empty-state', text: 'no active book yet' }));
-    card.appendChild(el('div', { class: 'add-button', text: '+ add book', onclick: () => {
-      const newBook = { id: uid(), title: '', author: '', currentPage: 0, totalPages: 0, active: true };
-      state.books.push(newBook);
-      if (!dd.reading) dd.reading = { bookId: null, todayPages: '', note: '' };
-      dd.reading.bookId = newBook.id;
-      saveState(); render();
-      setTimeout(() => { const t = document.querySelector('.book-title'); if (t) t.focus(); }, 0);
-    } }));
-    return card;
-  }
-
-  if (!dd.reading) dd.reading = { bookId: book.id, todayPages: '', note: '' };
-  if (!dd.reading.bookId) dd.reading.bookId = book.id;
-
-  const titleEl = el('div', { class: 'book-title', data: { placeholder: 'book title' } });
-  bindEditable(titleEl, () => book.title, v => book.title = v);
-  card.appendChild(titleEl);
-
-  const authorEl = el('div', { class: 'book-author', data: { placeholder: 'author' } });
-  bindEditable(authorEl, () => book.author, v => book.author = v);
-  card.appendChild(authorEl);
-
-  const pct = book.totalPages ? Math.round((book.currentPage / book.totalPages) * 100) : 0;
-  const progress = el('div', { class: 'book-progress' }, [el('div', { class: 'book-progress-fill', style: 'width:' + pct + '%' })]);
-  card.appendChild(progress);
-
-  const pagesRow = el('div', { class: 'book-pages' });
-  const cur = el('input', { class: 'page-input', type: 'number', min: '0', value: book.currentPage || 0, oninput: e => { book.currentPage = parseInt(e.target.value, 10) || 0; saveState(); const p = document.querySelector('.book-progress-fill'); const t = document.querySelectorAll('.book-pages span'); if (p && book.totalPages) p.style.width = Math.round((book.currentPage/book.totalPages)*100) + '%'; if (t.length) t[t.length-1].textContent = (book.totalPages ? Math.round((book.currentPage/book.totalPages)*100) : 0) + '%'; } });
-  const total = el('input', { class: 'page-input', type: 'number', min: '0', value: book.totalPages || 0, oninput: e => { book.totalPages = parseInt(e.target.value, 10) || 0; saveState(); const p = document.querySelector('.book-progress-fill'); if (p) p.style.width = (book.totalPages ? Math.round((book.currentPage/book.totalPages)*100) : 0) + '%'; } });
-
-  const pagesContent = el('span', {}, [cur, document.createTextNode(' / '), total, document.createTextNode(' pages')]);
-  pagesRow.appendChild(pagesContent);
-  pagesRow.appendChild(el('span', { text: pct + '%' }));
-  card.appendChild(pagesRow);
-
-  const today = el('div', { class: 'book-today' });
-  const todayPagesRow = el('div', { class: 'book-today-pages' });
-  const todayPagesInput = el('input', { class: 'page-input', type: 'number', min: '0', value: dd.reading.todayPages || 0, style: 'width:42px;', oninput: e => { dd.reading.todayPages = parseInt(e.target.value, 10) || 0; saveState(); } });
-  todayPagesRow.appendChild(document.createTextNode('today, '));
-  todayPagesRow.appendChild(todayPagesInput);
-  todayPagesRow.appendChild(document.createTextNode(' pages'));
-  today.appendChild(todayPagesRow);
-
-  const noteEl = el('div', { class: 'book-today-note', data: { placeholder: "note about today's reading..." } });
-  bindEditable(noteEl, () => dd.reading.note, v => dd.reading.note = v, { multiline: true });
-  today.appendChild(noteEl);
-  card.appendChild(today);
-
-  // Book switcher
-  if (state.books.length > 1) {
-    const sel = el('select', { class: 'status-select', style: 'margin-top:10px;', onchange: e => {
-      state.books.forEach(b => b.active = (b.id === e.target.value));
-      saveState(); render();
-    } });
-    state.books.forEach(b => {
-      const opt = el('option', { value: b.id, text: b.title || 'book' });
-      if (b.active) opt.selected = true;
-      sel.appendChild(opt);
-    });
-    card.appendChild(sel);
-  }
-
-  card.appendChild(el('div', { class: 'add-button', text: '+ book', style: 'margin-top:8px;', onclick: () => {
-    state.books.forEach(b => b.active = false);
-    const newBook = { id: uid(), title: '', author: '', currentPage: 0, totalPages: 0, active: true };
-    state.books.push(newBook);
-    saveState(); render();
-    setTimeout(() => { const t = document.querySelector('.book-title'); if (t) t.focus(); }, 0);
-  } }));
-
-  return card;
 }
 
 function exportData() {
@@ -3011,8 +2824,7 @@ function importData() {
             meta: Object.assign({}, fresh.meta, data.meta || {}),
             months: data.months || {},
             weeks: data.weeks || {},
-            days: data.days || {},
-            books: data.books || []
+            days: data.days || {}
           });
           saveState();
           applyTheme();
