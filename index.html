@@ -1006,6 +1006,65 @@ body.font-large .day-name { font-size: 12px; }
   pointer-events: none;
 }
 
+.schedule-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  cursor: text;
+  min-height: 4em;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+}
+.schedule-list:hover { background: var(--hover-bg); }
+.schedule-list li {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-primary);
+  padding-left: 14px;
+  position: relative;
+}
+.schedule-list li::before {
+  content: '\2022';
+  position: absolute;
+  left: 2px;
+  top: 0;
+  color: var(--accent-1);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.schedule-empty {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-very-faint);
+  min-height: 4em;
+}
+body.font-large .schedule-list li { font-size: 16px; }
+body.font-large .schedule-empty { font-size: 16px; }
+
+.schedule-edit {
+  width: 100%;
+  background: var(--focus-bg);
+  border: 0.5px solid var(--card-border);
+  border-radius: 3px;
+  padding: 4px 6px;
+  margin: -2px -4px;
+  outline: none;
+  resize: vertical;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-primary);
+  min-height: 4em;
+  box-sizing: border-box;
+}
+body.font-large .schedule-edit { font-size: 16px; }
+
 .wishes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -2239,6 +2298,54 @@ function renderMonthGoals(md, weekCount) {
   return wrap;
 }
 
+function renderScheduleEditor(holder) {
+  const wrap = el('div', { class: 'schedule-wrap' });
+
+  function getLines() {
+    return (holder.workout || '').split('\n').map(s => s.trim()).filter(Boolean);
+  }
+
+  function showView() {
+    wrap.innerHTML = '';
+    const lines = getLines();
+    if (lines.length === 0) {
+      const empty = el('div', { class: 'schedule-empty', text: 'tap to add items' });
+      empty.addEventListener('click', showEdit);
+      wrap.appendChild(empty);
+      return;
+    }
+    const ul = el('ul', { class: 'schedule-list' });
+    lines.forEach(line => ul.appendChild(el('li', { text: line })));
+    ul.addEventListener('click', showEdit);
+    wrap.appendChild(ul);
+  }
+
+  function showEdit() {
+    wrap.innerHTML = '';
+    const ta = document.createElement('textarea');
+    ta.className = 'schedule-edit';
+    ta.spellcheck = false;
+    ta.value = holder.workout || '';
+    ta.rows = Math.max(4, (holder.workout || '').split('\n').length + 1);
+    ta.placeholder = 'add an item, press Enter for the next one';
+    ta.addEventListener('blur', () => {
+      const cleaned = (ta.value || '').split('\n').map(s => s.trim()).filter(Boolean).join('\n');
+      holder.workout = cleaned;
+      saveState();
+      showView();
+    });
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Escape') ta.blur();
+    });
+    wrap.appendChild(ta);
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+  }
+
+  showView();
+  return wrap;
+}
+
 function renderGratitudeSection(holder, label) {
   if (!Array.isArray(holder.gratitude)) holder.gratitude = [];
   const list = holder.gratitude;
@@ -2774,14 +2881,12 @@ function renderDayView() {
     }
   }));
 
-  // Notes
+  // Schedule
   const workoutCol = el('div');
-  workoutCol.appendChild(el('div', { class: 'section-label', text: 'Notes' }));
+  workoutCol.appendChild(el('div', { class: 'section-label', text: 'Schedule' }));
   const woCard = el('div', { class: 'workout-card' });
-  woCard.appendChild(el('div', { class: 'workout-hint', text: 'anything you want to note down' }));
-  const woText = el('div', { class: 'workout-text', data: { placeholder: 'your notes...' } });
-  bindEditable(woText, () => dd.workout, v => dd.workout = v, { multiline: true });
-  woCard.appendChild(woText);
+  woCard.appendChild(el('div', { class: 'workout-hint', text: 'one item per line' }));
+  woCard.appendChild(renderScheduleEditor(dd));
   workoutCol.appendChild(woCard);
 
   cols.appendChild(todoCol);
