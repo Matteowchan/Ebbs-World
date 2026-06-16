@@ -1624,12 +1624,41 @@ function getWeekData(d) {
   return wd;
 }
 
+const FIXED_TODO_CATS = [['self', 'Self'], ['work', 'Work'], ['home', 'Home']];
+
 function getDayData(d) {
   const k = dateKey(d);
   if (!state.days[k]) state.days[k] = {};
   const dd = state.days[k];
-  if (!Array.isArray(dd.todos)) dd.todos = [];
   if (!Array.isArray(dd.todoCategories)) dd.todoCategories = [];
+
+  const known = { self: null, work: null, home: null };
+  const orphanTodos = [];
+
+  if (Array.isArray(dd.todos) && dd.todos.length) orphanTodos.push(...dd.todos);
+  dd.todos = [];
+
+  dd.todoCategories.forEach(c => {
+    let key = ['self', 'work', 'home'].includes(c.id) ? c.id : null;
+    if (!key) {
+      const n = (c.name || '').trim().toLowerCase();
+      if (n === 'self' || n === 'work' || n === 'home') key = n;
+    }
+    const todos = Array.isArray(c.todos) ? c.todos : [];
+    if (key && !known[key]) {
+      known[key] = { id: key, name: FIXED_TODO_CATS.find(f => f[0] === key)[1], todos };
+    } else {
+      orphanTodos.push(...todos);
+    }
+  });
+
+  if (orphanTodos.length) {
+    if (!known.self) known.self = { id: 'self', name: 'Self', todos: [] };
+    known.self.todos.push(...orphanTodos);
+  }
+
+  dd.todoCategories = FIXED_TODO_CATS.map(([id, name]) => known[id] || { id, name, todos: [] });
+
   if (typeof dd.workout !== 'string') dd.workout = '';
   if (typeof dd.verse !== 'string') dd.verse = '';
   if (!Array.isArray(dd.gratitude)) dd.gratitude = [];
@@ -2762,7 +2791,7 @@ function renderMealTable(wd, monday) {
 function rowItem(item, getText, setText, toggle, deleteFn) {
   const row = el('div', { class: 'row-item' + (item.done ? ' done' : '') });
   const cb = el('div', { class: 'checkbox' + (item.done ? ' checked' : ''), onclick: toggle });
-  const txt = el('span', { class: 'row-text' });
+  const txt = el('span', { class: 'row-text', data: { id: item.id } });
   bindEditable(txt, getText, setText);
   const del = el('span', { class: 'row-delete', text: '×', onclick: deleteFn });
   row.appendChild(cb); row.appendChild(txt); row.appendChild(del);
@@ -2793,52 +2822,16 @@ function renderDayView() {
 
   const cols = el('div', { class: 'three-col' });
 
-  // Todos
+  // Todos (sabit kategoriler: Self, Work, Home)
   const todoCol = el('div');
   todoCol.appendChild(el('div', { class: 'section-label', text: 'To-dos' }));
-  (dd.todos || []).forEach(t => {
-    todoCol.appendChild(rowItem(
-      t,
-      () => t.text,
-      v => t.text = v,
-      () => { t.done = !t.done; saveState(); render(); },
-      () => { dd.todos = dd.todos.filter(x => x.id !== t.id); saveState(); render(); }
-    ));
-  });
-  todoCol.appendChild(el('div', {
-    class: 'add-button',
-    text: '+ add',
-    onclick: () => {
-      if (!dd.todos) dd.todos = [];
-      dd.todos.push({ id: uid(), text: '', done: false });
-      saveState(); render();
-      setTimeout(() => {
-        const items = document.querySelectorAll('.row-text');
-        if (items.length) items[items.length-1].focus();
-      }, 0);
-    }
-  }));
 
-  // Categories
   (dd.todoCategories || []).forEach(cat => {
     if (!Array.isArray(cat.todos)) cat.todos = [];
     const catWrap = el('div', { class: 'todo-category' });
 
     const catHeader = el('div', { class: 'todo-category-header' });
-    const catName = el('span', { class: 'todo-category-name', data: { placeholder: 'category name' } });
-    bindEditable(catName, () => cat.name, v => cat.name = v);
-    catHeader.appendChild(catName);
-    catHeader.appendChild(el('span', {
-      class: 'todo-category-delete',
-      text: '×',
-      title: 'remove category',
-      onclick: () => {
-        const hasItems = cat.todos && cat.todos.length;
-        if (hasItems && !confirm('Remove this category and its items?')) return;
-        dd.todoCategories = dd.todoCategories.filter(c => c.id !== cat.id);
-        saveState(); render();
-      }
-    }));
+    catHeader.appendChild(el('span', { class: 'todo-category-name', text: cat.name }));
     catWrap.appendChild(catHeader);
 
     cat.todos.forEach(t => {
@@ -2855,31 +2848,18 @@ function renderDayView() {
       class: 'add-button',
       text: '+ add',
       onclick: () => {
-        cat.todos.push({ id: uid(), text: '', done: false });
+        const newId = uid();
+        cat.todos.push({ id: newId, text: '', done: false });
         saveState(); render();
         setTimeout(() => {
-          const items = document.querySelectorAll('.row-text');
-          if (items.length) items[items.length-1].focus();
+          const target = document.querySelector('.row-text[data-id="' + newId + '"]');
+          if (target) target.focus();
         }, 0);
       }
     }));
 
     todoCol.appendChild(catWrap);
   });
-
-  todoCol.appendChild(el('div', {
-    class: 'add-button add-category-btn',
-    text: '+ add category',
-    onclick: () => {
-      if (!dd.todoCategories) dd.todoCategories = [];
-      dd.todoCategories.push({ id: uid(), name: '', todos: [] });
-      saveState(); render();
-      setTimeout(() => {
-        const names = document.querySelectorAll('.todo-category-name');
-        if (names.length) names[names.length-1].focus();
-      }, 0);
-    }
-  }));
 
   // Schedule
   const workoutCol = el('div');
