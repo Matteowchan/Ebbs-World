@@ -415,14 +415,14 @@
   .sc-chip.on { color: var(--gold); border-color: var(--gold); background: rgba(212,165,116,0.14); }
   .sc-body { overflow-y: auto; padding: 4px 14px 14px; }
   .sc-lvl-head { font-family: 'Cinzel', serif; color: var(--gold); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; margin: 12px 0 4px; position: sticky; top: 0; background: var(--panel); padding: 4px 0; }
-  .sc-row { display: flex; align-items: flex-start; gap: 8px; padding: 7px 6px; border-bottom: 1px solid rgba(58,47,36,0.4); }
+  .sc-row { display: flex; align-items: flex-start; gap: 8px; padding: 7px 6px; border-bottom: 1px solid rgba(58,47,36,0.4); flex-wrap: wrap; }
   .sc-row .sc-name { color: var(--cream); font-weight: 600; cursor: pointer; }
   .sc-row .sc-name:hover { color: var(--gold); }
   .sc-row .sc-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
   .sc-row .sc-add { margin-left: auto; flex-shrink: 0; background: var(--gold-soft); border: none; color: #2a1c0e; border-radius: 4px; padding: 5px 14px; font-size: 11px; cursor: pointer; font-weight: 700; }
   .sc-row .sc-add:hover { filter: brightness(1.08); }
   .sc-row .sc-add.added { background: transparent; border: 1px solid var(--border); color: var(--muted); cursor: default; }
-  .sc-desc { margin-top: 6px; padding: 7px 9px; background: rgba(0,0,0,0.22); border-left: 2px solid var(--gold-soft); border-radius: 4px; color: var(--cream); font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
+  .sc-desc { margin-top: 6px; flex-basis: 100%; width: 100%; padding: 7px 9px; background: rgba(0,0,0,0.22); border-left: 2px solid var(--gold-soft); border-radius: 4px; color: var(--cream); font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
   #rest-popup.active, #grant-rest-popup.active { display: flex; }
   .rest-intro { font-size: 13px; color: var(--cream); line-height: 1.55; margin-bottom: 12px; font-family: 'Crimson Pro', serif; }
   .rest-intro b { color: var(--gold); }
@@ -808,6 +808,8 @@
   .magic-row .del { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 2px 6px; font-size: 15px; line-height: 1; }
   .magic-row .del:hover { color: var(--danger); }
   .magic-row .spell-roll { background: rgba(212,165,116,0.14); border: 1px solid var(--gold-soft); color: var(--gold); border-radius: 4px; padding: 2px 9px; font-size: 11px; cursor: pointer; font-family: 'Cinzel', serif; }
+  .magic-row .spell-cast { background: rgba(111,191,115,0.16); border: 1px solid rgba(111,191,115,0.5); color: #9fe0a0; border-radius: 4px; padding: 2px 9px; font-size: 11px; cursor: pointer; font-family: 'Cinzel', serif; flex-shrink: 0; }
+  .magic-row .spell-cast:hover { background: rgba(111,191,115,0.28); border-color: #6fbf73; }
   .magic-row .spell-dice { font-family: 'Cinzel', serif; font-size: 11px; color: var(--ember); background: rgba(224,140,58,0.12); border: 1px solid rgba(224,140,58,0.35); border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
   .magic-row .spell-roll:hover { background: rgba(212,165,116,0.28); }
   .magic-row .mr-desc { margin: 6px 2px 2px; padding: 7px 9px; background: rgba(0,0,0,0.22); border-left: 2px solid var(--gold-soft); border-radius: 4px; color: var(--cream); font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
@@ -5775,11 +5777,12 @@ const SUBCLASSES={"artificer":[{"n":"Armorer","s":"TC","f":"Fuse powerful magic 
       const row = document.createElement('div');
       row.className = 'feat-row';
       const own = (f.desc && String(f.desc).trim()) ? String(f.desc).trim() : '';
-      const looked = FEATURE_DESC[normalizeFeatKey(f.name)] || '';
+      let looked = FEATURE_DESC[normalizeFeatKey(f.name)] || '';
+      if (!looked && /core .* traits/.test(normalizeFeatKey(f.name))) looked = 'The baseline proficiencies, hit dice, and starting features your class grants at level 1.';
       const desc = own || looked;
       const descText = desc || 'No description yet. Add one with the field below.';
       row.innerHTML = `
-        <div class="feat-body">
+        <div class="feat-body" title="${escapeHtml(desc || 'Click to add a description below')}">
           <div class="feat-name">${escapeHtml(f.name || '')}</div>
           <div class="feat-desc" hidden>${escapeHtml(descText)}</div>
         </div>
@@ -5789,7 +5792,6 @@ const SUBCLASSES={"artificer":[{"n":"Armorer","s":"TC","f":"Fuse powerful magic 
       const descEl = row.querySelector('.feat-desc');
       if (body && descEl) {
         body.style.cursor = 'pointer';
-        body.title = 'Click to show or hide the description';
         body.addEventListener('click', () => { descEl.hidden = !descEl.hidden; });
       }
       const del = row.querySelector('.feat-del');
@@ -6051,19 +6053,29 @@ const SUBCLASSES={"artificer":[{"n":"Armorer","s":"TC","f":"Fuse powerful magic 
     return SRD_SPELLS.find(s => s.n.toLowerCase() === ln) || NONSRD_SPELLS.find(s => s.n.toLowerCase() === ln) || null;
   }
 
-  function occupySpellSlotForAdd(level) {
-    if (!level || level < 1) return; // cantrips need no slot
+  function castSpellSlot(level) {
+    if (!level || level < 1) return;
     if (!CHAR_POPUP.magic) CHAR_POPUP.magic = emptyMagicData();
     if (!CHAR_POPUP.magic.slots) CHAR_POPUP.magic.slots = {};
     const slots = CHAR_POPUP.magic.slots;
-    let s = slots[level];
-    if (!s || (!s.cur && !s.max && !s.active)) {
-      // First spell of this level: reveal a slot row with a rough default max the player can adjust.
-      const defMax = level <= 2 ? 3 : (level <= 5 ? 2 : 1);
-      slots[level] = s = { cur: defMax, max: defMax, active: true };
+    const spend = (lv, label) => {
+      slots[lv].cur -= 1;
+      renderMagic(CHAR_POPUP.magic);
+      scheduleSavePlayer();
+      toast(`${label} Lv ${lv} slot (${slots[lv].cur}/${slots[lv].max} left)`);
+    };
+    if (slots[level] && slots[level].cur > 0) { spend(level, 'Cast,'); return; }
+    for (let lv = level + 1; lv <= 9; lv++) {
+      if (slots[lv] && slots[lv].cur > 0) { spend(lv, 'Upcast,'); return; }
     }
-    if (s.cur > 0) { s.cur -= 1; toast(`Lv ${level} slot occupied (${s.cur}/${s.max} left)`); }
-    else { toast(`No Lv ${level} slot left`, 'error'); }
+    const exists = slots[level] && (slots[level].max > 0 || slots[level].active);
+    if (exists) { toast(`No Lv ${level} or higher slot left`, 'error'); return; }
+    // No slot row for this level yet: reveal one with a sensible default and spend one.
+    const defMax = level <= 2 ? 3 : (level <= 5 ? 2 : 1);
+    slots[level] = { cur: defMax - 1, max: defMax, active: true };
+    renderMagic(CHAR_POPUP.magic);
+    scheduleSavePlayer();
+    toast(`Cast, Lv ${level} slot (${defMax - 1}/${defMax} left)`);
   }
 
   function addSpellObj(s) {
@@ -6077,7 +6089,6 @@ const SUBCLASSES={"artificer":[{"n":"Armorer","s":"TC","f":"Fuse powerful magic 
       if (!Array.isArray(CHAR_POPUP.magic.spells)) CHAR_POPUP.magic.spells = [];
       if (CHAR_POPUP.magic.spells.some(sp => (sp.name || '').toLowerCase() === s.n.toLowerCase())) { toast(s.n + ' already added', 'error'); return; }
       CHAR_POPUP.magic.spells.push({ name: s.n, level: s.l, desc: s.e, prepared: false, info: s.d || '', dmg: s.dmg || null, atk: s.atk || null });
-      occupySpellSlotForAdd(s.l);
     }
     renderMagic(CHAR_POPUP.magic);
     scheduleSavePlayer();
@@ -6097,7 +6108,6 @@ const SUBCLASSES={"artificer":[{"n":"Armorer","s":"TC","f":"Fuse powerful magic 
       if (!Array.isArray(CHAR_POPUP.magic.spells)) CHAR_POPUP.magic.spells = [];
       if (CHAR_POPUP.magic.spells.some(sp => (sp.name || '').toLowerCase() === s.n.toLowerCase())) { toast(s.n + ' already added', 'error'); return; }
       CHAR_POPUP.magic.spells.push({ name: s.n, level: s.l, desc: s.e, prepared: false, info: s.d || '', dmg: s.dmg || null, atk: s.atk || null });
-      occupySpellSlotForAdd(s.l);
     }
     renderMagic(CHAR_POPUP.magic);
     scheduleSavePlayer();
@@ -6422,6 +6432,7 @@ const SUBCLASSES={"artificer":[{"n":"Armorer","s":"TC","f":"Fuse powerful magic 
           <div class="mr-head">
             <input type="checkbox" class="prep-check" data-i="${realIdx}" ${sp.prepared ? 'checked' : ''} ${canEdit ? '' : 'disabled'} title="Prepared">
             <div class="name"><b>L${sp.level}</b>${escapeHtml(sp.name)} <span class="meta">${escapeHtml(sp.desc || '')}</span></div>
+            ${canEdit ? `<button class="spell-cast" data-i="${realIdx}" title="Cast: spend a Lv ${sp.level} slot">Cast</button>` : ''}
             ${sp.dmg ? `<span class="spell-dice" title="Damage at this level">${escapeHtml(spellDiceFor(sp) || '')}</span><button class="spell-roll" data-kind="sp" data-i="${realIdx}" title="Roll damage">Roll</button>` : ''}
             ${canEdit ? `<button class="del" data-i="${realIdx}" data-kind="sp" title="Remove">×</button>` : ''}
           </div>
@@ -8328,6 +8339,13 @@ const SUBCLASSES={"artificer":[{"n":"Armorer","s":"TC","f":"Fuse powerful magic 
           const i = parseInt(rollBtn.dataset.i);
           const arr = rollBtn.dataset.kind === 'cant' ? CHAR_POPUP.magic.cantrips : CHAR_POPUP.magic.spells;
           if (arr && arr[i]) rollSpellDamage(arr[i]);
+          return;
+        }
+        const castBtn = e.target.closest('button.spell-cast');
+        if (castBtn) {
+          const i = parseInt(castBtn.dataset.i);
+          const sp = CHAR_POPUP.magic && CHAR_POPUP.magic.spells[i];
+          if (sp) castSpellSlot(sp.level);
           return;
         }
         const btn = e.target.closest('button.del');
