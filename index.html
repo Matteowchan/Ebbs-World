@@ -1469,6 +1469,7 @@
       <button id="long-rest-btn" title="Long Rest (8 hours): full HP, full spell slots, half Hit Dice restored, exhaustion reduced by 1.">Long Rest</button>
       <button id="switch-role-btn" style="display:none;" title="Demo mode only">Switch Role</button>
       <button id="leave-btn" class="danger">Leave</button>
+      <button id="logout-btn" title="Sign out of your account">Sign out</button>
     </div>
   </div>
 
@@ -12406,6 +12407,13 @@ const SUBCLASSES={"artificer":[{"n":"Armorer","s":"TC","f":"Fuse powerful magic 
     navigator.clipboard.writeText(link)
       .then(() => toast('Invite link copied'))
       .catch(() => navigator.clipboard.writeText(STATE.sessionId).then(() => toast('Code copied')));
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    if (!confirm('Sign out of your account? You will return to the login screen.')) return;
+    try { await sb.auth.signOut(); } catch (e) {}
+    try { clearSessionState(); } catch (e) {}
+    location.reload();
   });
 
   // ============ LEAVE ============
